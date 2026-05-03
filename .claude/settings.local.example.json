@@ -1,0 +1,8 @@
+{
+  "additionalDirectories": [
+    "../sample-project/backend",
+    "../sample-project/frontend",
+    "../sample-project/database",
+    "../sample-project/docs"
+  ]
+}

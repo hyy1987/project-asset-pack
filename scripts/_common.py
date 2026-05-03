@@ -1,0 +1,316 @@
+from __future__ import annotations
+
+import json
+import shutil
+import subprocess
+import sys
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any
+
+
+REPO_ROOT = Path(__file__).resolve().parent.parent
+
+
+def utc_now() -> str:
+    return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+
+
+def load_project_config(project_id: str) -> dict[str, Any]:
+    config_path = REPO_ROOT / "configs" / "projects" / f"{project_id}.yaml"
+    if not config_path.is_file():
+        raise RuntimeError(f"Missing project config: {config_path}")
+
+    config: dict[str, Any] = {
+        "project_id": project_id,
+        "repositories": [],
+        "security": {},
+        "output": {},
+    }
+    current_section: str | None = None
+    current_item: dict[str, str] | None = None
+
+    for raw_line in config_path.read_text(encoding="utf-8").splitlines():
+        line = raw_line.rstrip()
+        stripped = line.strip()
+        if not stripped or stripped.startswith("#"):
+            continue
+
+        if not line.startswith(" ") and ":" in line:
+            key, value = stripped.split(":", 1)
+            key = key.strip()
+            value = value.strip()
+            current_section = key
+            current_item = None
+            if value:
+                config[key] = value
+            elif key not in config:
+                config[key] = {}
+            continue
+
+        if current_section == "repositories":
+            if stripped.startswith("- "):
+                current_item = {}
+                config["repositories"].append(current_item)
+                remainder = stripped[2:].strip()
+                if ":" in remainder:
+                    key, value = remainder.split(":", 1)
+                    current_item[key.strip()] = value.strip()
+            elif current_item is not None and ":" in stripped:
+                key, value = stripped.split(":", 1)
+                current_item[key.strip()] = value.strip()
+            continue
+
+        if current_section in {"security", "output"} and ":" in stripped:
+            key, value = stripped.split(":", 1)
+            config[current_section][key.strip()] = value.strip()
+
+    return config
+
+
+def get_project_repositories(project_id: str) -> list[dict[str, Any]]:
+    config = load_project_config(project_id)
+    repos: list[dict[str, Any]] = []
+    for repo in config.get("repositories", []):
+        name = repo.get("name")
+        raw_path = repo.get("path")
+        if not name or not raw_path:
+            continue
+        path = (REPO_ROOT / raw_path).resolve()
+        repos.append(
+            {
+                "name": name,
+                "path": path,
+                "description": repo.get("description", ""),
+            }
+        )
+    return repos
+
+
+def baseline_path(project_id: str) -> Path:
+    return REPO_ROOT / "workspace" / "snapshots" / f"{project_id}-repo-baseline.json"
+
+
+def load_baseline(project_id: str) -> dict[str, Any] | None:
+    path = baseline_path(project_id)
+    if not path.is_file():
+        return None
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def save_baseline(project_id: str, snapshots: list[dict[str, str]], source: str) -> Path:
+    payload = {
+        "schema_version": 1,
+        "project_id": project_id,
+        "recorded_at": utc_now(),
+        "source": source,
+        "repos": {
+            snapshot["repo"]: {
+                "branch": snapshot["branch"],
+                "head": snapshot["head"],
+                "upstream": snapshot["upstream"],
+                "upstream_head": snapshot["upstream_head"],
+                "description": snapshot.get("description", ""),
+            }
+            for snapshot in snapshots
+        },
+    }
+    path = baseline_path(project_id)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(payload, indent=2, ensure_ascii=False, sort_keys=True) + "\n", encoding="utf-8")
+    return path
+
+
+def run_git(args: list[str], cwd: Path, capture_output: bool = False) -> str:
+    result = subprocess.run(
+        ["git", "-c", f"safe.directory={cwd.resolve().as_posix()}", *args],
+        cwd=cwd,
+        check=False,
+        text=True,
+        encoding="utf-8",
+        stdout=subprocess.PIPE if capture_output else None,
+        stderr=subprocess.PIPE if capture_output else None,
+    )
+    if result.returncode != 0:
+        if capture_output:
+            if result.stdout:
+                sys.stdout.write(result.stdout)
+            if result.stderr:
+                sys.stderr.write(result.stderr)
+        raise RuntimeError(f"git {' '.join(args)} failed in {cwd} with exit code {result.returncode}.")
+    return result.stdout or ""
+
+
+def ensure_git_repo(repo: dict[str, Any]) -> None:
+    path = repo["path"]
+    if not path.is_dir():
+        raise RuntimeError(f"Repository directory not found: {path}")
+    if not (path / ".git").exists():
+        raise RuntimeError(f"Not a git repository: {path}")
+
+
+def ensure_clean_worktree(repo: dict[str, Any]) -> None:
+    status = run_git(["status", "--short", "--untracked-files=all"], cwd=repo["path"], capture_output=True)
+    if status.strip():
+        raise RuntimeError(
+            f"Repository {repo['name']} has local changes. "
+            "Remote sync requires a clean working tree."
+        )
+
+
+def get_branch(repo: dict[str, Any]) -> str:
+    return run_git(["rev-parse", "--abbrev-ref", "HEAD"], cwd=repo["path"], capture_output=True).strip()
+
+
+def get_upstream(repo: dict[str, Any]) -> str:
+    return run_git(
+        ["rev-parse", "--abbrev-ref", "--symbolic-full-name", "@{u}"],
+        cwd=repo["path"],
+        capture_output=True,
+    ).strip()
+
+
+def get_sha(repo: dict[str, Any], ref: str = "HEAD") -> str:
+    return run_git(["rev-parse", ref], cwd=repo["path"], capture_output=True).strip()
+
+
+def get_ahead_behind(repo: dict[str, Any]) -> tuple[int, int]:
+    counts = run_git(["rev-list", "--left-right", "--count", "HEAD...@{u}"], cwd=repo["path"], capture_output=True)
+    ahead_text, behind_text = counts.strip().split()
+    return int(ahead_text), int(behind_text)
+
+
+def get_snapshot(repo: dict[str, Any]) -> dict[str, str]:
+    return {
+        "repo": repo["name"],
+        "branch": get_branch(repo),
+        "head": get_sha(repo, "HEAD"),
+        "upstream": get_upstream(repo),
+        "upstream_head": get_sha(repo, "@{u}"),
+        "description": repo.get("description", ""),
+    }
+
+
+def sync_repo_to_upstream(repo: dict[str, Any], fetch: bool = True, fast_forward: bool = True) -> dict[str, str]:
+    ensure_git_repo(repo)
+    ensure_clean_worktree(repo)
+    if fetch:
+        run_git(["fetch", "--prune"], cwd=repo["path"])
+
+    ahead, behind = get_ahead_behind(repo)
+    upstream = get_upstream(repo)
+    if ahead > 0 and behind > 0:
+        raise RuntimeError(f"Repository {repo['name']} has diverged from {upstream}. Resolve it manually first.")
+    if ahead > 0:
+        raise RuntimeError(
+            f"Repository {repo['name']} is ahead of {upstream}. "
+            "Push local commits or reset manually before syncing asset pack docs."
+        )
+    if behind > 0 and fast_forward:
+        run_git(["merge", "--ff-only", "@{u}"], cwd=repo["path"])
+
+    return get_snapshot(repo)
+
+
+def sync_project_repositories(project_id: str, fetch: bool = True, fast_forward: bool = True) -> list[dict[str, str]]:
+    return [
+        sync_repo_to_upstream(repo, fetch=fetch, fast_forward=fast_forward)
+        for repo in get_project_repositories(project_id)
+    ]
+
+
+def is_ancestor(repo: dict[str, Any], older_ref: str, newer_ref: str) -> bool:
+    result = subprocess.run(
+        ["git", "-c", f"safe.directory={repo['path'].resolve().as_posix()}", "merge-base", "--is-ancestor", older_ref, newer_ref],
+        cwd=repo["path"],
+        check=False,
+        text=True,
+        encoding="utf-8",
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+    if result.returncode == 0:
+        return True
+    if result.returncode == 1:
+        return False
+    raise RuntimeError(f"git merge-base --is-ancestor failed in {repo['path']} with exit code {result.returncode}.")
+
+
+def commit_log(repo: dict[str, Any], old_ref: str, new_ref: str, limit: int = 20) -> list[str]:
+    output = run_git(["log", "--no-decorate", "--oneline", f"-n{limit}", f"{old_ref}..{new_ref}"], cwd=repo["path"], capture_output=True)
+    return [line for line in output.splitlines() if line.strip()]
+
+
+def changed_files(repo: dict[str, Any], old_ref: str, new_ref: str, limit: int = 80) -> list[str]:
+    output = run_git(["diff", "--name-only", old_ref, new_ref], cwd=repo["path"], capture_output=True)
+    return [line for line in output.splitlines() if line.strip()][:limit]
+
+
+def commit_count(repo: dict[str, Any], old_ref: str, new_ref: str) -> int:
+    output = run_git(["rev-list", "--count", f"{old_ref}..{new_ref}"], cwd=repo["path"], capture_output=True)
+    return int(output.strip())
+
+
+def collect_changes(project_id: str, previous_state: dict[str, Any] | None, snapshots: list[dict[str, str]]) -> list[dict[str, Any]]:
+    previous_repos = (previous_state or {}).get("repos", {})
+    repos_by_name = {repo["name"]: repo for repo in get_project_repositories(project_id)}
+    changes: list[dict[str, Any]] = []
+
+    for snapshot in snapshots:
+        repo_name = snapshot["repo"]
+        previous = previous_repos.get(repo_name)
+        previous_head = previous.get("head") if previous else None
+        current_head = snapshot["head"]
+        if previous_head == current_head:
+            continue
+
+        record: dict[str, Any] = {
+            "repo": repo_name,
+            "branch": snapshot["branch"],
+            "upstream": snapshot["upstream"],
+            "previous_head": previous_head,
+            "current_head": current_head,
+        }
+        if previous_head is None:
+            record["reason"] = "missing-baseline"
+        else:
+            repo = repos_by_name[repo_name]
+            record["reason"] = "commit-range"
+            record["is_ancestor"] = is_ancestor(repo, previous_head, current_head)
+            record["commit_count"] = commit_count(repo, previous_head, current_head)
+            record["commits"] = commit_log(repo, previous_head, current_head)
+            record["files"] = changed_files(repo, previous_head, current_head)
+        changes.append(record)
+
+    return changes
+
+
+def get_claude_command() -> str:
+    claude = shutil.which("claude")
+    if claude is None:
+        raise RuntimeError("Claude CLI was not found in PATH. Install Claude Code first.")
+    return claude
+
+
+def invoke_claude_skill(skill_file: str, context_lines: list[str], label: str) -> int:
+    skill_path = REPO_ROOT / skill_file
+    if not skill_path.is_file():
+        raise RuntimeError(f"Skill definition not found: {skill_path}")
+
+    prompt = "\n".join(
+        [
+            f"Read and follow `{skill_file}`.",
+            "Treat that skill file as the authoritative workflow for this run.",
+            "Do not rely on slash-command parsing for this invocation.",
+            "",
+            *context_lines,
+        ]
+    )
+    print(f"Running Claude Code: {label}")
+    result = subprocess.run(
+        [get_claude_command(), "-p", prompt, "--permission-mode", "acceptEdits"],
+        cwd=REPO_ROOT,
+        check=False,
+    )
+    return result.returncode
+

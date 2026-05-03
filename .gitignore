@@ -1,0 +1,16 @@
+.claude/settings.local.json
+__pycache__/
+*.pyc
+scripts/__pycache__/
+workspace/input/
+workspace/sanitized/
+workspace/logs/*
+workspace/snapshots/*
+outputs/generated/*
+outputs/reviewed/*
+outputs/publish/*
+!workspace/logs/.gitkeep
+!workspace/snapshots/.gitkeep
+!outputs/generated/.gitkeep
+!outputs/reviewed/.gitkeep
+!outputs/publish/.gitkeep

@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(**)",
+      "Write(outputs/**)",
+      "Write(workspace/snapshots/**)",
+      "Write(workspace/logs/**)"
+    ]
+  }
+}
+

@@ -1,0 +1,38 @@
+project_id: sample-project
+project_name: 示例项目
+project_type: historical
+status: sample
+owners:
+  project_manager: 待填写
+  tech_lead: 待填写
+  test_lead: 待填写
+repositories:
+  - name: backend
+    path: ../sample-project/backend
+    description: 后端服务仓库
+  - name: frontend
+    path: ../sample-project/frontend
+    description: 前端应用仓库
+  - name: database
+    path: ../sample-project/database
+    description: 数据库结构或迁移资料仓库
+documents:
+  requirements:
+    - ../sample-project/docs/requirements
+  designs:
+    - ../sample-project/docs/designs
+  api:
+    - ../sample-project/docs/api
+  database:
+    - ../sample-project/database
+  tests:
+    - ../sample-project/docs/tests
+  defects:
+    - ../sample-project/docs/defects
+  delivery:
+    - ../sample-project/docs/delivery
+security:
+  rule_set: default-outsourcing-project
+output:
+  generated: outputs/generated/sample-project
+  reviewed: outputs/reviewed/sample-project
