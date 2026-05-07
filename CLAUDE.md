@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-你正在 `project-asset-pack` 中运行 Claude Code。本目录是项目资产包智能体和 Agent-First 软件外包项目工作台的唯一控制面。
+你正在 `project-asset-pack` 中运行 Claude Code。本目录是项目资产包智能体和 Agent-First 软件外包项目工作台的控制面。
 
 ## 工作目标
 
@@ -19,32 +19,51 @@
 - 接入项目前期资料
 - 生成人类和 Agent 的信息对齐稿
 - 生成项目启动清单和责任视角问题清单
-- 生成阶段计划和第一阶段目标
+- 生成阶段计划和阶段目标
 - 按阶段执行开发、自检、测试和资产包更新
 - 输出阶段报告并等待人工评审
 - 项目结题或阶段性归档时，汇总工作台过程资料生成标准资产包初稿
 
+## 新窗口恢复规则
+
+Claude Code 的聊天历史不是工作台状态来源。新窗口、上下文丢失或中途恢复时，必须先检查工作台状态。
+
+如果 `workspace/workbench/<project_id>/state.json` 存在：
+
+1. 不要提示用户重新初始化。
+2. 先运行或建议运行 `python scripts/resume_project_workbench.py --project <project_id>`。
+3. 读取 `outputs/generated/workbench/<project_id>/resume-brief.md`。
+4. 优先读取 `outputs/reviewed/workbench/<project_id>/` 中的人工确认和评审结果。
+5. 再读取 `outputs/generated/workbench/<project_id>/` 中的 AI 初稿和阶段输出。
+6. 根据当前状态继续阶段执行、阶段评审、下一阶段规划或归档。
+
+只有状态文件不存在，或人类明确要求“重新初始化/重建工作台”，才运行初始化流程。
+
 ## 关键约束
 
-- 默认不修改业务项目仓库；只有项目配置和阶段计划明确允许时，才能执行阶段开发改动。
+- 默认不修改业务项目仓库；只有项目配置、阶段计划和人类授权都明确允许时，才能执行阶段开发改动。
 - 不把 Claude Code 配置写入业务项目仓库。
 - 不生成或保留客户敏感原文。
 - 不输出账号、密码、Token、密钥、证书、生产连接串。
 - 不读取生产数据库备份、客户真实业务数据、合同金额、报价和商业策略。
 - 对无法确认的内容必须标记为“待人工确认”，不能编造。
 - AI 输出全部视为初稿，正式资产包必须经过人工评审。
+- 不绕过人工评审直接进入下一阶段。
 
 ## 输入优先级
 
 执行任务时按以下顺序读取上下文：
 
 1. `configs/projects/<project_id>.yaml`
-2. `configs/security-rules/<rule_set>.md`
-3. `inputs/pre-project/<project_id>/` 或配置中声明的前期资料目录
-4. `outputs/reviewed/workbench/<project_id>/` 中已经人工确认的信息
-5. `templates/**`
-6. 已通过 `additionalDirectories` 接入的项目仓库和资料目录
-7. 用户在当前会话中补充的说明
+2. `workspace/workbench/<project_id>/state.json`
+3. `outputs/generated/workbench/<project_id>/resume-brief.md`
+4. `configs/security-rules/<rule_set>.md`
+5. `inputs/pre-project/<project_id>/` 或配置中声明的前期资料目录
+6. `outputs/reviewed/workbench/<project_id>/` 中已经人工确认的信息
+7. `outputs/generated/workbench/<project_id>/` 中的 AI 初稿和阶段输出
+8. `templates/**`
+9. 已通过 `additionalDirectories` 接入的项目仓库和资料目录
+10. 用户在当前会话中补充的说明
 
 ## 输出要求
 
@@ -63,7 +82,7 @@
 - 对敏感内容只描述类型，不写原值。
 - 每个风险项给出影响、证据、建议处理方式。
 - 每个资料缺口给出缺口说明、影响、建议补充人。
-- 每个可复用资产候选标注复用等级：可直接复用、可改造复用、仅供参考、不可跨客户复用。
+- 每个可复用资产候选标注复用等级：可直接复用、可改造复用、仅供参考、不跨客户复用。
 
 ## 禁止事项
 

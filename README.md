@@ -24,26 +24,27 @@
    - 接入新项目的前期资料。
    - 生成信息对齐稿、项目启动清单、责任视角问题清单、资产包骨架和风险行动清单。
    - 人工确认项目上下文。
-   - 生成阶段计划和第一阶段目标。
+   - 生成阶段计划和阶段目标。
    - 让 Agent 按阶段执行开发任务、自检和测试。
    - 输出阶段报告和资产包更新。
    - 人工评审阶段结果。
    - 评审通过后进入下一阶段。
    - 项目结题或阶段性归档时，把工作台过程资料归档为标准项目资产包初稿。
+   - 新 Claude Code 窗口可通过恢复摘要继续工作，避免重复初始化。
 
 ## 目录结构
 
 ```text
 project-asset-pack/
-├── .claude/                  Claude Code 配置和 skills
-├── configs/                  项目接入配置和安全规则
-├── docs/                     使用手册、人工补充和评审意见
-├── examples/                 可提交的示例项目材料
-├── inputs/                   真实项目前期资料输入区，默认不提交
-├── outputs/                  AI 初稿、人工评审结果和发布产物，默认不提交
-├── scripts/                  自动化脚本
-├── templates/                资产包和工作台输出模板
-└── workspace/                状态、日志和快照，默认不提交
+|-- .claude/      Claude Code 配置和 skills
+|-- configs/      项目接入配置和安全规则
+|-- docs/         使用手册、人工补充和评审意见
+|-- examples/     可提交的示例项目材料
+|-- inputs/       真实项目前期资料输入区，默认不提交
+|-- outputs/      AI 初稿、人工评审结果和发布产物，默认不提交
+|-- scripts/      自动化脚本
+|-- templates/    资产包和工作台输出模板
+`-- workspace/    状态、日志和快照，默认不提交
 ```
 
 ## 快速验证 sample-project
@@ -80,6 +81,7 @@ python scripts/confirm_project_context.py --project sample-project --decision co
 python scripts/plan_project_stage.py --project sample-project --stage-id stage-1 --title "第一阶段" --no-claude --overwrite
 python scripts/run_project_stage.py --project sample-project --stage-id stage-1 --no-claude --overwrite
 python scripts/review_project_stage.py --project sample-project --stage-id stage-1 --decision approve --no-claude --overwrite
+python scripts/resume_project_workbench.py --project sample-project --no-claude --overwrite
 python scripts/finalize_workbench_asset_pack.py --project sample-project --no-claude --overwrite
 python scripts/check_project_workbench.py --project sample-project
 ```
@@ -104,6 +106,28 @@ claude
 ```text
 请按 .claude/skills/init-project-workbench/SKILL.md 的规则，基于 configs/projects/sample-project.yaml 和 examples/sample-project/pre-project 生成 sample-project 的工作台初始化输出。
 ```
+
+## 新窗口恢复
+
+Claude Code 的聊天历史不是工作台进度来源。工作台进度记录在：
+
+```text
+workspace/workbench/<project_id>/state.json
+```
+
+如果 Claude Code 新窗口不知道当前进度，先运行：
+
+```powershell
+python scripts/resume_project_workbench.py --project my-project
+```
+
+它会生成：
+
+```text
+outputs/generated/workbench/my-project/resume-brief.md
+```
+
+新窗口中的 Claude Code 应先读取这份恢复摘要，再继续阶段执行、阶段评审、下一阶段规划或归档。只有状态文件不存在，或人类明确要求重建，才重新初始化。
 
 ## Agent-First 工作台流程
 
@@ -231,6 +255,7 @@ python scripts/check_project_health.py --project my-project --period weekly
 工作台相关：
 
 - `/init-project-workbench`
+- `/resume-project-workbench`
 - `/plan-project-stage`
 - `/run-project-stage`
 - `/review-project-stage`
@@ -243,28 +268,29 @@ python scripts/check_project_health.py --project my-project --period weekly
 
 ```text
 outputs/generated/workbench/my-project/
-├── info-alignment.md
-├── project-kickoff-checklist.md
-├── responsibility-questions.md
-├── asset-pack-skeleton.md
-└── risk-action-list.md
+|-- info-alignment.md
+|-- project-kickoff-checklist.md
+|-- responsibility-questions.md
+|-- asset-pack-skeleton.md
+|-- risk-action-list.md
+`-- resume-brief.md
 ```
 
 阶段输出到：
 
 ```text
 outputs/generated/workbench/my-project/stages/stage-1/
-├── stage-plan.md
-├── stage-report.md
-└── asset-pack-update.md
+|-- stage-plan.md
+|-- stage-report.md
+`-- asset-pack-update.md
 ```
 
 人工确认和阶段评审输出到：
 
 ```text
 outputs/reviewed/workbench/my-project/
-├── human-confirmation.md
-└── stages/stage-1/stage-review.md
+|-- human-confirmation.md
+`-- stages/stage-1/stage-review.md
 ```
 
 工作台状态保存到：
@@ -277,12 +303,12 @@ workspace/workbench/my-project/state.json
 
 ```text
 outputs/generated/my-project/
-├── review-report.md
-├── asset-pack-draft.md
-├── missing-materials.md
-├── risk-list.md
-├── reusable-assets.md
-└── workbench-archive-summary.md
+|-- review-report.md
+|-- asset-pack-draft.md
+|-- missing-materials.md
+|-- risk-list.md
+|-- reusable-assets.md
+`-- workbench-archive-summary.md
 ```
 
 这些仍是 AI 初稿，必须经过 `review_asset_pack.py` 人工评审后才能进入 `outputs/reviewed/my-project/`。
