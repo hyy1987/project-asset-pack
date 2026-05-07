@@ -68,6 +68,151 @@ def load_project_config(project_id: str) -> dict[str, Any]:
     return config
 
 
+def read_project_config_text(project_id: str) -> str:
+    config_path = REPO_ROOT / "configs" / "projects" / f"{project_id}.yaml"
+    if not config_path.is_file():
+        raise RuntimeError(f"Missing project config: {config_path}")
+    return config_path.read_text(encoding="utf-8")
+
+
+def find_simple_yaml_value(text: str, dotted_key: str, default: str = "") -> str:
+    parts = dotted_key.split(".")
+    if len(parts) == 1:
+        prefix = f"{parts[0]}:"
+        for raw_line in text.splitlines():
+            stripped = raw_line.strip()
+            if stripped.startswith(prefix):
+                return stripped.split(":", 1)[1].strip()
+        return default
+
+    section, key = parts[0], parts[1]
+    in_section = False
+    for raw_line in text.splitlines():
+        if not raw_line.strip() or raw_line.strip().startswith("#"):
+            continue
+        if not raw_line.startswith(" ") and raw_line.strip().endswith(":"):
+            in_section = raw_line.strip() == f"{section}:"
+            continue
+        if in_section and raw_line.startswith(" ") and raw_line.strip().startswith(f"{key}:"):
+            return raw_line.strip().split(":", 1)[1].strip()
+    return default
+
+
+def project_security_rule_set(project_id: str) -> str:
+    config = load_project_config(project_id)
+    return config.get("security", {}).get("rule_set") or "default-outsourcing-project"
+
+
+def pre_project_materials_dir(project_id: str) -> Path:
+    text = read_project_config_text(project_id)
+    configured = find_simple_yaml_value(text, "workbench.pre_project_materials")
+    if configured:
+        return (REPO_ROOT / configured).resolve()
+    return REPO_ROOT / "inputs" / "pre-project" / project_id
+
+
+def workbench_allows_code_changes(project_id: str) -> bool:
+    text = read_project_config_text(project_id)
+    value = find_simple_yaml_value(text, "workbench.allow_code_changes", "false").lower()
+    return value in {"true", "yes", "1", "on"}
+
+
+def generated_workbench_dir(project_id: str) -> Path:
+    return REPO_ROOT / "outputs" / "generated" / "workbench" / project_id
+
+
+def reviewed_workbench_dir(project_id: str) -> Path:
+    return REPO_ROOT / "outputs" / "reviewed" / "workbench" / project_id
+
+
+def workbench_state_path(project_id: str) -> Path:
+    return REPO_ROOT / "workspace" / "workbench" / project_id / "state.json"
+
+
+def stage_generated_dir(project_id: str, stage_id: str) -> Path:
+    return generated_workbench_dir(project_id) / "stages" / stage_id
+
+
+def stage_reviewed_dir(project_id: str, stage_id: str) -> Path:
+    return reviewed_workbench_dir(project_id) / "stages" / stage_id
+
+
+def generated_asset_pack_dir(project_id: str) -> Path:
+    config = load_project_config(project_id)
+    return REPO_ROOT / config.get("output", {}).get("generated", f"outputs/generated/{project_id}")
+
+
+def load_workbench_state(project_id: str) -> dict[str, Any]:
+    path = workbench_state_path(project_id)
+    if not path.is_file():
+        return {
+            "schema_version": 1,
+            "project_id": project_id,
+            "created_at": utc_now(),
+            "updated_at": utc_now(),
+            "status": "new",
+            "current_stage_id": None,
+            "stages": {},
+        }
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def save_workbench_state(project_id: str, state: dict[str, Any]) -> Path:
+    state["updated_at"] = utc_now()
+    path = workbench_state_path(project_id)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(state, indent=2, ensure_ascii=False, sort_keys=True) + "\n", encoding="utf-8")
+    return path
+
+
+def ensure_workbench_dirs(project_id: str) -> None:
+    for path in [
+        pre_project_materials_dir(project_id),
+        generated_workbench_dir(project_id),
+        reviewed_workbench_dir(project_id),
+        workbench_state_path(project_id).parent,
+    ]:
+        path.mkdir(parents=True, exist_ok=True)
+
+
+def list_material_files(project_id: str, limit: int = 80) -> list[str]:
+    root = pre_project_materials_dir(project_id)
+    if not root.exists():
+        return []
+    files: list[str] = []
+    for path in sorted(root.rglob("*")):
+        if path.is_file():
+            files.append(path.relative_to(REPO_ROOT).as_posix())
+            if len(files) >= limit:
+                break
+    return files
+
+
+def render_template(template_path: Path, values: dict[str, str]) -> str:
+    content = template_path.read_text(encoding="utf-8")
+    for key, value in values.items():
+        content = content.replace("{{" + key + "}}", value)
+    return content
+
+
+def write_rendered_template(template_name: str, output_path: Path, values: dict[str, str], overwrite: bool = False) -> Path:
+    template_path = REPO_ROOT / "templates" / "workbench" / template_name
+    if not template_path.is_file():
+        raise RuntimeError(f"Missing workbench template: {template_path}")
+    if output_path.exists() and not overwrite:
+        return output_path
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(render_template(template_path, values), encoding="utf-8")
+    return output_path
+
+
+def repo_relative(path: Path) -> str:
+    try:
+        return path.resolve().relative_to(REPO_ROOT).as_posix()
+    except ValueError:
+        return path.as_posix()
+
+
 def get_project_repositories(project_id: str) -> list[dict[str, Any]]:
     config = load_project_config(project_id)
     repos: list[dict[str, Any]] = []
@@ -313,4 +458,3 @@ def invoke_claude_skill(skill_file: str, context_lines: list[str], label: str) -
         check=False,
     )
     return result.returncode
-

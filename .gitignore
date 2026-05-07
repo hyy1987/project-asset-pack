@@ -5,12 +5,16 @@ scripts/__pycache__/
 workspace/input/
 workspace/sanitized/
 workspace/logs/*
+workspace/workbench/*
 workspace/snapshots/*
+inputs/pre-project/*
 outputs/generated/*
 outputs/reviewed/*
 outputs/publish/*
 !workspace/logs/.gitkeep
+!workspace/workbench/.gitkeep
 !workspace/snapshots/.gitkeep
+!inputs/pre-project/.gitkeep
 !outputs/generated/.gitkeep
 !outputs/reviewed/.gitkeep
 !outputs/publish/.gitkeep

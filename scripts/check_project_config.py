@@ -36,6 +36,9 @@ def parse_simple_yaml(path: Path) -> dict:
         elif current_key and "path:" in stripped:
             _, value = stripped.split("path:", 1)
             data.setdefault("_paths", []).append(value.strip())
+        elif current_key and "pre_project_materials:" in stripped:
+            _, value = stripped.split("pre_project_materials:", 1)
+            data.setdefault("_paths", []).append(value.strip())
         elif current_key and stripped.startswith("- "):
             value = stripped[2:].strip()
             if value and not value.endswith(":") and looks_like_path(value):
@@ -72,10 +75,14 @@ def main() -> int:
             missing.append(str(candidate))
 
     if missing:
+        sample_mode = data.get("status") == "sample"
         print("Missing referenced paths:")
         for item in missing:
             print(f"- {item}")
-        return 1
+        if sample_mode:
+            print("Sample config uses placeholder paths; missing paths are reported as warnings.")
+        else:
+            return 1
 
     settings_example = ROOT / ".claude" / "settings.local.example.json"
     if settings_example.exists():
