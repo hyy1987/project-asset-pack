@@ -27,8 +27,12 @@ python scripts\init_project_workbench.py --project <project_id>
 1. `configs/projects/<project_id>.yaml`
 2. `configs/security-rules/<rule_set>.md`
 3. `inputs/pre-project/<project_id>/` 或配置中声明的前期资料目录
-4. `templates/workbench/*.md`
-5. 用户在会话中补充的说明
+4. `templates/workbench/info-alignment.md`
+5. `templates/workbench/project-kickoff-checklist.md`
+6. `templates/workbench/responsibility-questions.md`
+7. `templates/workbench/asset-pack-skeleton.md`
+8. `templates/workbench/risk-action-list.md`
+9. 用户在会话中补充的说明
 
 ## 输出
 
@@ -50,4 +54,5 @@ python scripts\init_project_workbench.py --project <project_id>
 4. 输出必须让人类可以直接评审和修正。
 5. 如果发现账号、密码、Token、密钥、证书、生产连接串、客户真实业务数据、合同金额或报价策略，只记录敏感类型和资料类别，不写原值。
 6. 生成后提醒人类把确认意见写入 `docs/manual/workbench-confirmations/<project_id>.md`，或直接在会话中补充。
+7. 初始化只做信息对齐和启动资料整理，不生成全周期规划；全周期规划必须在人类确认上下文后单独执行 `plan-project-lifecycle`。
 

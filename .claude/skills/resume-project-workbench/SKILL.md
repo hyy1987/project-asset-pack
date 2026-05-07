@@ -21,8 +21,8 @@ python scripts\resume_project_workbench.py --project <project_id>
 1. `configs/projects/<project_id>.yaml`
 2. `workspace/workbench/<project_id>/state.json`
 3. `outputs/reviewed/workbench/<project_id>/`
-4. `outputs/generated/workbench/<project_id>/`
-5. `outputs/generated/workbench/<project_id>/lifecycle-plan.md`
+4. `outputs/generated/workbench/<project_id>/lifecycle-plan.md`
+5. `outputs/generated/workbench/<project_id>/`
 6. 当前阶段的 `stage-plan.md`、`stage-report.md`、`asset-pack-update.md`
 7. `outputs/generated/workbench/<project_id>/resume-brief.md`
 

@@ -35,7 +35,7 @@ python scripts/resume_project_workbench.py --project <project_id>
 outputs/generated/workbench/<project_id>/resume-brief.md
 ```
 
-新窗口中的 Claude Code 应先阅读 `resume-brief.md`，再决定继续阶段执行、进入阶段评审、规划下一阶段，还是进行阶段性归档。只有状态文件不存在，或人类明确要求重建，才重新初始化工作台。
+新窗口中的 Claude Code 应先阅读 `resume-brief.md`，再决定继续阶段执行、进入阶段评审、修订全周期规划、规划下一阶段，还是进行阶段性归档。只有状态文件不存在，或人类明确要求重建，才重新初始化工作台。
 
 ## 最小流程
 
@@ -53,6 +53,8 @@ outputs/generated/workbench/<project_id>/resume-brief.md
 12. 基于最新全周期规划生成下一阶段计划。
 13. 项目结题或阶段性归档时，运行 `python scripts/finalize_workbench_asset_pack.py --project <project_id>`。
 14. 运行 `python scripts/review_asset_pack.py --project <project_id>` 进行正式资产包评审定稿。
+
+默认工作方式是一个 Agent 作为阶段开发执行者。多人合作主要进入阶段计划确认、阶段评审和验收授权，不建议多个 Agent 终端同时推进同一阶段开发。
 
 任意一步中断后，都可以先运行：
 

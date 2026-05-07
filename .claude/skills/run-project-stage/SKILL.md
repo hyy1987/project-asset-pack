@@ -24,9 +24,10 @@ python scripts\run_project_stage.py --project <project_id> --stage-id <stage_id>
 
 1. 项目配置和安全规则。
 2. 已确认的项目信息或人工确认记录。
-3. `outputs/generated/workbench/<project_id>/stages/<stage_id>/stage-plan.md`
-4. 已接入的业务项目仓库和资料目录。
-5. `templates/workbench/stage-report.md`
+3. `outputs/generated/workbench/<project_id>/lifecycle-plan.md`
+4. `outputs/generated/workbench/<project_id>/stages/<stage_id>/stage-plan.md`
+5. 已接入的业务项目仓库和资料目录。
+6. `templates/workbench/stage-report.md`
 
 ## 输出
 
@@ -44,9 +45,10 @@ outputs/generated/workbench/<project_id>/stages/<stage_id>/asset-pack-update.md
 1. 读取阶段计划和已确认上下文。
 2. 检查是否存在阻塞性待确认问题。
 3. 如未获授权修改代码，只生成执行建议和待确认问题，不改业务仓库。
-4. 如已获授权，按阶段计划拆分任务并实施。
+4. 如已获授权，按阶段计划拆解执行步骤并实施；默认由一个 Agent 会话推进本阶段开发。
 5. 运行可用的自检、测试、类型检查或构建命令；无法运行时说明原因。
 6. 更新阶段资产包摘要。
 7. 生成阶段报告，列出变更、测试结果、风险、待评审事项和下一步建议。
 8. 不得绕过人工评审进入下一阶段。
+9. 不建议多个 Agent 终端同时推进同一阶段开发；多人主要在计划确认和阶段评审时进入。
 

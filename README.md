@@ -129,7 +129,7 @@ python scripts/resume_project_workbench.py --project my-project
 outputs/generated/workbench/my-project/resume-brief.md
 ```
 
-新窗口中的 Claude Code 应先读取这份恢复摘要，再继续阶段执行、阶段评审、下一阶段规划或归档。只有状态文件不存在，或人类明确要求重建，才重新初始化。
+新窗口中的 Claude Code 应先读取这份恢复摘要，再继续阶段执行、阶段评审、全周期规划修订、下一阶段规划或归档。只有状态文件不存在，或人类明确要求重建，才重新初始化。
 
 ## Agent-First 工作台流程
 
@@ -182,6 +182,8 @@ python scripts/plan_project_stage.py --project my-project --stage-id stage-1 --t
 ```powershell
 python scripts/run_project_stage.py --project my-project --stage-id stage-1
 ```
+
+当前工作台默认推荐一个 Agent 作为阶段开发执行者。多人协作主要在阶段计划确认、阶段报告评审、风险判断和验收授权时进入，不建议多个 Agent 终端同时推进同一阶段开发。
 
 默认不修改业务项目仓库。需要 Agent 修改业务项目时，必须同时满足：
 
