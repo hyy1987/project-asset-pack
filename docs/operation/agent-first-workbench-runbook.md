@@ -5,6 +5,7 @@
 ## 目录约定
 
 - 前期资料：`inputs/pre-project/<project_id>/`
+- 示例前期资料：`examples/sample-project/pre-project/`
 - AI 工作台输出：`outputs/generated/workbench/<project_id>/`
 - 人工评审输出：`outputs/reviewed/workbench/<project_id>/`
 - 工作台状态：`workspace/workbench/<project_id>/state.json`
@@ -39,6 +40,7 @@ workbench:
 如果当前机器没有 Claude Code，先使用 `--no-claude` 验证目录、模板和状态推进：
 
 ```powershell
+python scripts/check_project_config.py --project sample-project
 python scripts/init_project_workbench.py --project sample-project --no-claude
 python scripts/confirm_project_context.py --project sample-project --decision confirmed
 python scripts/plan_project_stage.py --project sample-project --stage-id stage-1 --title "第一阶段" --no-claude

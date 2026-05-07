@@ -4,6 +4,6 @@
     "../sample-project/frontend",
     "../sample-project/database",
     "../sample-project/docs",
-    "inputs/pre-project/sample-project"
+    "examples/sample-project/pre-project"
   ]
 }

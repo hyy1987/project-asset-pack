@@ -112,6 +112,14 @@ python scripts/check_project_health.py --project my-project --period weekly
 inputs/pre-project/my-project/
 ```
 
+仓库内置了一个可直接测试的示例材料目录：
+
+```text
+examples/sample-project/pre-project/
+```
+
+`configs/projects/sample-project.yaml` 已经指向这个目录，可以直接用 `sample-project` 验证工作台流程。
+
 2. 启动项目工作台：
 
 ```powershell
