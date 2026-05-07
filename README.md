@@ -72,6 +72,34 @@ python scripts/check_project_config.py --project sample-project
 
 `sample-project` 的业务代码仓库路径是占位示例，缺失路径会以 warning 形式提示；这不影响前期资料工作台流程验证。
 
+## 推荐使用方式
+
+`project-asset-pack` 的主要使用场景是在 Claude Code 中由 Agent 读取规则、执行工作流和生成文件。
+
+推荐顺序是：
+
+1. **自然语言启动**：最适合日常使用，也最符合 Agent-First 工作方式。
+2. **快捷命令启动**：适合熟悉项目后快速触发固定 skill。
+3. **Python 脚本启动**：适合离线验证、自动化、CI 或 Claude Code 不可用时检查目录和状态。
+
+例如启动一个新项目工作台，可以直接在 Claude Code 里说：
+
+```text
+请基于 my-project 的配置和前期资料，启动 Agent-First 项目工作台，完成信息对齐稿、项目启动清单、责任视角问题清单、资产包骨架和风险行动清单。
+```
+
+也可以用快捷命令：
+
+```text
+/init-project-workbench my-project
+```
+
+脚本方式是底层稳定入口：
+
+```powershell
+python scripts/init_project_workbench.py --project my-project
+```
+
 ### 离线验证
 
 不调用 Claude Code，只验证目录、模板和状态推进：
@@ -119,6 +147,18 @@ workspace/workbench/<project_id>/state.json
 
 如果 Claude Code 新窗口不知道当前进度，先运行：
 
+```text
+/resume-project-workbench my-project
+```
+
+或直接说：
+
+```text
+请恢复 my-project 的工作台上下文，先读取状态文件、人工评审结果、全周期规划和恢复摘要，然后告诉我当前阶段和下一步。
+```
+
+底层脚本入口：
+
 ```powershell
 python scripts/resume_project_workbench.py --project my-project
 ```
@@ -153,37 +193,101 @@ workbench:
   allow_code_changes: false
 ```
 
-启动项目工作台：
+### 1. 启动项目工作台
+
+自然语言：
+
+```text
+请基于 my-project 的配置和前期资料，启动 Agent-First 项目工作台，生成信息对齐稿、项目启动清单、责任视角问题清单、资产包骨架和风险行动清单。
+```
+
+快捷命令：
+
+```text
+/init-project-workbench my-project
+```
+
+脚本：
 
 ```powershell
 python scripts/init_project_workbench.py --project my-project
 ```
 
-人工确认信息对齐结果：
+### 2. 记录人工确认
+
+自然语言：
+
+```text
+我已经确认 my-project 的信息对齐稿，请把当前上下文记录为已确认。
+```
+
+脚本：
 
 ```powershell
 python scripts/confirm_project_context.py --project my-project --decision confirmed
 ```
 
-生成项目全周期规划：
+### 3. 生成项目全周期规划
+
+自然语言：
+
+```text
+请基于 my-project 已确认的上下文，生成项目全周期规划，覆盖交付范围、阶段路线图、里程碑、风险假设和后续调整规则。
+```
+
+快捷命令：
+
+```text
+/plan-project-lifecycle my-project
+```
+
+脚本：
 
 ```powershell
 python scripts/plan_project_lifecycle.py --project my-project
 ```
 
-生成第一阶段计划：
+### 4. 生成阶段计划
+
+自然语言：
+
+```text
+请基于 my-project 的全周期规划，生成 stage-1 的阶段计划，阶段名称为“第一阶段”。
+```
+
+快捷命令：
+
+```text
+/plan-project-stage my-project stage-1 第一阶段
+```
+
+脚本：
 
 ```powershell
 python scripts/plan_project_stage.py --project my-project --stage-id stage-1 --title "第一阶段"
 ```
 
-执行第一阶段：
+当前工作台默认推荐一个 Agent 作为阶段开发执行者。多人协作主要在阶段计划确认、阶段报告评审、风险判断和验收授权时进入，不建议多个 Agent 终端同时推进同一阶段开发。
+
+### 5. 执行阶段开发
+
+自然语言：
+
+```text
+请按 my-project 的 stage-1 阶段计划执行本阶段工作，完成自检、测试、阶段报告和资产包更新。默认不要修改业务仓库，除非配置和人工授权都允许。
+```
+
+快捷命令：
+
+```text
+/run-project-stage my-project stage-1
+```
+
+脚本：
 
 ```powershell
 python scripts/run_project_stage.py --project my-project --stage-id stage-1
 ```
-
-当前工作台默认推荐一个 Agent 作为阶段开发执行者。多人协作主要在阶段计划确认、阶段报告评审、风险判断和验收授权时进入，不建议多个 Agent 终端同时推进同一阶段开发。
 
 默认不修改业务项目仓库。需要 Agent 修改业务项目时，必须同时满足：
 
@@ -195,13 +299,41 @@ python scripts/run_project_stage.py --project my-project --stage-id stage-1
 python scripts/run_project_stage.py --project my-project --stage-id stage-1 --allow-code-changes
 ```
 
-人工评审阶段结果：
+### 6. 评审阶段结果
+
+自然语言：
+
+```text
+请根据 my-project 的 stage-1 阶段报告和人工评审意见，生成阶段评审记录。评审通过后，不要直接进入下一阶段，先提醒我检查全周期规划是否需要调整。
+```
+
+快捷命令：
+
+```text
+/review-project-stage my-project stage-1 approve
+```
+
+脚本：
 
 ```powershell
 python scripts/review_project_stage.py --project my-project --stage-id stage-1 --decision approve
 ```
 
 阶段通过后，不要直接凭聊天继续做下一期。先检查全周期规划是否需要调整：
+
+自然语言：
+
+```text
+stage-1 已通过评审，请基于阶段结果检查并修订 my-project 的全周期规划，再给出后续阶段建议。
+```
+
+快捷命令：
+
+```text
+/plan-project-lifecycle my-project
+```
+
+脚本：
 
 ```powershell
 python scripts/plan_project_lifecycle.py --project my-project --revision-reason "stage-1 评审后调整后续路线"
@@ -213,7 +345,21 @@ python scripts/plan_project_lifecycle.py --project my-project --revision-reason 
 python scripts/plan_project_stage.py --project my-project --stage-id stage-2 --title "第二阶段"
 ```
 
-项目结题或阶段性归档时，生成标准资产包初稿：
+### 7. 结题或阶段性归档
+
+自然语言：
+
+```text
+请把 my-project 的工作台过程资料归档为标准项目资产包初稿，保留待人工评审标记。
+```
+
+快捷命令：
+
+```text
+/finalize-workbench-asset-pack my-project
+```
+
+脚本：
 
 ```powershell
 python scripts/finalize_workbench_asset_pack.py --project my-project
@@ -225,7 +371,7 @@ python scripts/finalize_workbench_asset_pack.py --project my-project
 python scripts/review_asset_pack.py --project my-project
 ```
 
-检查工作台状态：
+检查工作台状态仍建议用脚本：
 
 ```powershell
 python scripts/check_project_workbench.py --project my-project
@@ -235,11 +381,21 @@ python scripts/check_project_workbench.py --project my-project
 
 历史项目或已有项目可以直接走资产包流程。
 
-初始化资产包：
+### 初始化资产包
+
+自然语言：
+
+```text
+请基于 my-project 的配置、代码仓库和资料目录，生成项目资产包初稿，包括现状审查报告、资产包初稿、资料缺口、风险清单和可复用资产候选。
+```
+
+快捷命令：
 
 ```text
 /init-asset-pack my-project
 ```
+
+### 保存远程仓库基线
 
 保存远程仓库基线：
 
@@ -247,19 +403,61 @@ python scripts/check_project_workbench.py --project my-project
 python scripts/save_remote_baseline.py --project my-project
 ```
 
-后续更新资产包：
+### 增量更新资产包
+
+自然语言：
+
+```text
+请检查 my-project 的代码仓库相对上次基线是否有变化，并根据变化范围增量更新项目资产包初稿。
+```
+
+快捷命令：
+
+```text
+/update-asset-pack my-project
+```
+
+脚本：
 
 ```powershell
 python scripts/update_asset_pack.py --project my-project
 ```
 
-人工评审后定稿：
+### 人工评审后定稿
+
+自然语言：
+
+```text
+请基于 my-project 的 AI 资产包初稿和人工评审意见，整理正式项目资产包并输出到 reviewed 目录。
+```
+
+快捷命令：
+
+```text
+/review-asset-pack my-project
+```
+
+脚本：
 
 ```powershell
 python scripts/review_asset_pack.py --project my-project
 ```
 
-在研项目或维护项目体检：
+### 在研项目或维护项目体检
+
+自然语言：
+
+```text
+请对 my-project 做一次 weekly 项目体检，检查资料沉淀、代码变化、测试缺陷、风险和交付准备状态。
+```
+
+快捷命令：
+
+```text
+/check-project-health my-project weekly
+```
+
+脚本：
 
 ```powershell
 python scripts/check_project_health.py --project my-project --period weekly
