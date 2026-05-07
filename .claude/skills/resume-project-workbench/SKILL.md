@@ -22,8 +22,9 @@ python scripts\resume_project_workbench.py --project <project_id>
 2. `workspace/workbench/<project_id>/state.json`
 3. `outputs/reviewed/workbench/<project_id>/`
 4. `outputs/generated/workbench/<project_id>/`
-5. 当前阶段的 `stage-plan.md`、`stage-report.md`、`asset-pack-update.md`
-6. `outputs/generated/workbench/<project_id>/resume-brief.md`
+5. `outputs/generated/workbench/<project_id>/lifecycle-plan.md`
+6. 当前阶段的 `stage-plan.md`、`stage-report.md`、`asset-pack-update.md`
+7. `outputs/generated/workbench/<project_id>/resume-brief.md`
 
 ## 输出
 
@@ -42,7 +43,8 @@ outputs/generated/workbench/<project_id>/resume-brief.md
 3. `outputs/generated/workbench/<project_id>/` 中的内容只视为 AI 初稿。
 4. 根据状态文件判断项目处于初始化、信息确认、阶段计划、阶段执行、阶段评审、阶段通过或资产包归档中的哪一步。
 5. 明确告诉用户当前状态、当前阶段、已有产物、缺口和下一步建议。
-6. 如果当前阶段已有计划但没有报告，建议继续运行阶段执行。
-7. 如果当前阶段已有报告但没有人工评审，建议进入阶段评审。
-8. 如果当前阶段已通过评审，建议规划下一阶段或进行阶段性归档。
-9. 只有状态文件不存在，或用户明确说“重新初始化/重建工作台”，才建议执行初始化。
+6. 如果全周期规划缺失，优先建议生成全周期规划，不要直接继续下一阶段开发。
+7. 如果当前阶段已有计划但没有报告，建议继续运行阶段执行。
+8. 如果当前阶段已有报告但没有人工评审，建议进入阶段评审。
+9. 如果当前阶段已通过评审，先建议检查并必要时修订全周期规划，再规划下一阶段或进行阶段性归档。
+10. 只有状态文件不存在，或用户明确说“重新初始化/重建工作台”，才建议执行初始化。

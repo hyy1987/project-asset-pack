@@ -75,6 +75,7 @@ def infer_next_action(state: dict[str, Any], stage_id: str | None) -> str:
     current_stage_id = stage_id or state.get("current_stage_id")
     stages = state.get("stages", {})
     stage = stages.get(current_stage_id, {}) if current_stage_id else {}
+    has_lifecycle_plan = bool(state.get("lifecycle_plan"))
 
     if status == "new":
         return "未发现已初始化的工作台状态。请先运行初始化流程。"
@@ -83,8 +84,14 @@ def infer_next_action(state: dict[str, Any], stage_id: str | None) -> str:
     if status == "context-review-required":
         return "信息对齐仍需人工确认。请先补充或修正人工确认记录。"
     if status == "context-confirmed":
-        return "项目上下文已确认。下一步应生成或确认第一阶段计划。"
+        return "项目上下文已确认。下一步应先生成项目全周期规划，再生成第一阶段计划。"
+    if status == "lifecycle-planned":
+        if state.get("last_approved_stage_id"):
+            return f"全周期规划已更新，最近通过阶段为 {state.get('last_approved_stage_id')}。下一步应基于最新全周期规划生成下一阶段计划。"
+        return "项目全周期规划已生成。下一步应基于全周期规划生成或确认当前阶段计划。"
     if status == "stage-planned":
+        if not has_lifecycle_plan:
+            return "当前只有阶段计划，缺少全周期规划。下一步应先补生成项目全周期规划，再确认阶段计划。"
         return f"阶段 {current_stage_id or '待确认'} 已有计划。下一步应确认阶段目标，并在授权边界内执行阶段任务。"
     if status == "stage-running":
         if stage.get("report"):
@@ -93,7 +100,9 @@ def infer_next_action(state: dict[str, Any], stage_id: str | None) -> str:
     if status == "stage-review-required":
         return f"阶段 {current_stage_id or '待确认'} 未通过或仍需评审。下一步应根据评审意见返工。"
     if status == "stage-approved":
-        return f"阶段 {state.get('last_approved_stage_id') or current_stage_id or '待确认'} 已通过评审。下一步可以规划下一阶段，或在阶段性归档时生成标准资产包初稿。"
+        if not has_lifecycle_plan:
+            return f"阶段 {state.get('last_approved_stage_id') or current_stage_id or '待确认'} 已通过评审，但缺少全周期规划。下一步应补生成全周期规划，再规划后续阶段。"
+        return f"阶段 {state.get('last_approved_stage_id') or current_stage_id or '待确认'} 已通过评审。下一步应先检查并必要时修订全周期规划，再规划下一阶段或进行阶段性归档。"
     if status == "asset-pack-draft-generated":
         return "工作台过程资料已归档为标准资产包初稿。下一步应执行人工资产包评审定稿。"
     return "请根据状态文件、已评审资料和当前阶段输出确认下一步。"
@@ -119,6 +128,7 @@ def main() -> int:
         "status": str(state.get("status", "待确认")),
         "current_stage_id": str(stage_id or "待确认"),
         "last_approved_stage_id": str(state.get("last_approved_stage_id", "待确认")),
+        "lifecycle_plan": str(state.get("lifecycle_plan", "未生成")),
         "state_file": repo_relative(state_path),
         "pre_project_materials": repo_relative(material_dir),
         "material_list": format_list(list_material_files(args.project), "未发现前期资料。"),
@@ -156,7 +166,9 @@ def main() -> int:
             f"Resume brief: outputs/generated/workbench/{args.project}/resume-brief.md",
             f"Current stage id: {stage_id or '<none>'}",
             f"Current status: {state.get('status')}",
+            f"Lifecycle plan: {state.get('lifecycle_plan', '<missing>')}",
             "Do not initialize the workbench again if the state file exists.",
+            "Read lifecycle plan before stage plans. If it is missing, tell the user to generate it before continuing stage work.",
             "Read reviewed outputs before generated outputs, then tell the user the current status and next action.",
         ],
         label=f"Resume Agent-First workbench for {args.project}",

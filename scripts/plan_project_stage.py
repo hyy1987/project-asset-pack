@@ -29,15 +29,17 @@ def parse_args() -> argparse.Namespace:
 def main() -> int:
     args = parse_args()
     out_dir = stage_generated_dir(args.project, args.stage_id)
+    state = load_workbench_state(args.project)
+    lifecycle_plan = state.get("lifecycle_plan") or f"outputs/generated/workbench/{args.project}/lifecycle-plan.md"
     values = {
         "project_id": args.project,
         "stage_id": args.stage_id,
         "stage_title": args.title,
         "generated_at": utc_now(),
+        "lifecycle_plan": lifecycle_plan,
     }
     plan_path = write_rendered_template("stage-plan.md", out_dir / "stage-plan.md", values, overwrite=args.overwrite)
 
-    state = load_workbench_state(args.project)
     state["status"] = "stage-planned"
     state["current_stage_id"] = args.stage_id
     state.setdefault("stages", {}).setdefault(args.stage_id, {})
@@ -47,10 +49,13 @@ def main() -> int:
             "title": args.title,
             "status": "planned",
             "plan": repo_relative(plan_path),
+            "lifecycle_plan": lifecycle_plan,
         }
     )
     save_workbench_state(args.project, state)
     print(f"Created stage plan scaffold: {plan_path}")
+    if not state.get("lifecycle_plan"):
+        print("Warning: lifecycle plan is not recorded in state yet. Run plan_project_lifecycle.py before finalizing stage plans.")
 
     if args.no_claude:
         return 0
@@ -62,7 +67,9 @@ def main() -> int:
             f"Stage id: {args.stage_id}",
             f"Stage title: {args.title}",
             f"Security rule set: {project_security_rule_set(args.project)}",
+            f"Lifecycle plan: {lifecycle_plan}",
             f"Stage plan output: outputs/generated/workbench/{args.project}/stages/{args.stage_id}/stage-plan.md",
+            "Stage plan must follow the lifecycle plan. If the lifecycle plan is missing or outdated, ask to create or revise it first.",
         ],
         label=f"Plan stage {args.stage_id} for {args.project}",
     )

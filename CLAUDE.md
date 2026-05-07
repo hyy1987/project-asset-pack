@@ -19,7 +19,8 @@
 - 接入项目前期资料
 - 生成人类和 Agent 的信息对齐稿
 - 生成项目启动清单和责任视角问题清单
-- 生成阶段计划和阶段目标
+- 生成项目全周期规划
+- 基于全周期规划生成阶段计划和阶段目标
 - 按阶段执行开发、自检、测试和资产包更新
 - 输出阶段报告并等待人工评审
 - 项目结题或阶段性归档时，汇总工作台过程资料生成标准资产包初稿
@@ -34,8 +35,9 @@ Claude Code 的聊天历史不是工作台状态来源。新窗口、上下文�
 2. 先运行或建议运行 `python scripts/resume_project_workbench.py --project <project_id>`。
 3. 读取 `outputs/generated/workbench/<project_id>/resume-brief.md`。
 4. 优先读取 `outputs/reviewed/workbench/<project_id>/` 中的人工确认和评审结果。
-5. 再读取 `outputs/generated/workbench/<project_id>/` 中的 AI 初稿和阶段输出。
-6. 根据当前状态继续阶段执行、阶段评审、下一阶段规划或归档。
+5. 读取 `outputs/generated/workbench/<project_id>/lifecycle-plan.md`。
+6. 再读取 `outputs/generated/workbench/<project_id>/` 中的 AI 初稿和阶段输出。
+7. 根据当前状态继续阶段执行、阶段评审、全周期规划修订、下一阶段规划或归档。
 
 只有状态文件不存在，或人类明确要求“重新初始化/重建工作台”，才运行初始化流程。
 
@@ -60,10 +62,11 @@ Claude Code 的聊天历史不是工作台状态来源。新窗口、上下文�
 4. `configs/security-rules/<rule_set>.md`
 5. `inputs/pre-project/<project_id>/` 或配置中声明的前期资料目录
 6. `outputs/reviewed/workbench/<project_id>/` 中已经人工确认的信息
-7. `outputs/generated/workbench/<project_id>/` 中的 AI 初稿和阶段输出
-8. `templates/**`
-9. 已通过 `additionalDirectories` 接入的项目仓库和资料目录
-10. 用户在当前会话中补充的说明
+7. `outputs/generated/workbench/<project_id>/lifecycle-plan.md`
+8. `outputs/generated/workbench/<project_id>/` 中的 AI 初稿和阶段输出
+9. `templates/**`
+10. 已通过 `additionalDirectories` 接入的项目仓库和资料目录
+11. 用户在当前会话中补充的说明
 
 ## 输出要求
 

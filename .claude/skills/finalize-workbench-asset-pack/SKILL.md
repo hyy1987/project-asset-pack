@@ -19,9 +19,10 @@ python scripts\finalize_workbench_asset_pack.py --project <project_id>
 1. 项目配置：`configs/projects/<project_id>.yaml`
 2. 安全规则：`configs/security-rules/<rule_set>.md`
 3. 工作台 AI 输出：`outputs/generated/workbench/<project_id>/`
-4. 工作台人工确认和阶段评审：`outputs/reviewed/workbench/<project_id>/`
-5. 工作台状态：`workspace/workbench/<project_id>/state.json`
-6. 标准资产包模板：
+4. 全周期规划：`outputs/generated/workbench/<project_id>/lifecycle-plan.md`
+5. 工作台人工确认和阶段评审：`outputs/reviewed/workbench/<project_id>/`
+6. 工作台状态：`workspace/workbench/<project_id>/state.json`
+7. 标准资产包模板：
    - `templates/asset-pack/asset-pack-draft.md`
    - `templates/review-report/review-report.md`
    - `templates/missing-materials/missing-materials.md`
@@ -48,8 +49,9 @@ python scripts\finalize_workbench_asset_pack.py --project <project_id>
 3. 已通过人工评审的阶段内容，可以作为“已确认过程记录”引用。
 4. 未评审或评审未通过的阶段，必须标记为“待确认”。
 5. 风险、资料缺口、测试结果、部署交接、可复用资产必须从阶段报告、资产包更新、人工评审记录中归纳。
-6. 不得输出敏感原文。
-7. 不得编造未在工作台过程资料中出现的内容。
+6. 必须把全周期规划作为交付范围、阶段路线和里程碑的上位依据。
+7. 不得输出敏感原文。
+8. 不得编造未在工作台过程资料中出现的内容。
 
 ## 字段映射
 
@@ -57,6 +59,7 @@ python scripts\finalize_workbench_asset_pack.py --project <project_id>
 - `project-kickoff-checklist.md` -> 需求摘要、资料缺口摘要、补全建议
 - `asset-pack-skeleton.md` -> 项目资产包主结构
 - `risk-action-list.md` -> 风险清单、补全建议
+- `lifecycle-plan.md` -> 交付范围、全周期阶段路线、里程碑和后续规划调整依据
 - `stages/*/stage-plan.md` -> 阶段目标、范围和验收线索
 - `stages/*/stage-report.md` -> 代码地图、核心模块、测试与缺陷、部署交接
 - `stages/*/asset-pack-update.md` -> 资产包增量内容

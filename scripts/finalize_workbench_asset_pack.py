@@ -100,6 +100,7 @@ def main() -> int:
 - 当前状态：{state.get('status', '待确认')}
 - 当前阶段：{state.get('current_stage_id', '待确认')}
 - 最近通过阶段：{state.get('last_approved_stage_id', '待确认')}
+- 全周期规划：{state.get('lifecycle_plan', '待确认')}
 
 ## 前期资料
 
@@ -110,6 +111,7 @@ def main() -> int:
 - 工作台 AI 输出：{repo_relative(workbench_generated)}
 - 工作台人工确认与评审：{repo_relative(workbench_reviewed)}
 - 工作台状态文件：workspace/workbench/{args.project}/state.json
+- 全周期规划文件：{state.get('lifecycle_plan', '待确认')}
 
 ## 阶段记录
 
@@ -144,6 +146,7 @@ def main() -> int:
             f"Security rule set: {project_security_rule_set(args.project)}",
             f"Workbench generated directory: {repo_relative(workbench_generated)}",
             f"Workbench reviewed directory: {repo_relative(workbench_reviewed)}",
+            f"Lifecycle plan: {state.get('lifecycle_plan', '<missing>')}",
             f"Standard asset pack draft directory: {repo_relative(out_dir)}",
             "Generate the standard asset pack draft files from workbench process evidence.",
         ],

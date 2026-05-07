@@ -44,6 +44,7 @@ def main() -> int:
         generated_dir / "responsibility-questions.md",
         generated_dir / "asset-pack-skeleton.md",
         generated_dir / "risk-action-list.md",
+        generated_dir / "lifecycle-plan.md",
         state_path,
     ]:
         if not path.exists():

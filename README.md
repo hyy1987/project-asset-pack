@@ -2,7 +2,7 @@
 
 基于 Claude Code 的项目资产包生成、评审、增量更新和 Agent-First 软件外包项目工作台。
 
-当前项目已经从“历史项目资产包生成工具”扩展为一个文件化工作台 MVP，用来支持外包项目从前期资料接入、信息对齐、阶段计划、阶段执行、阶段评审，到结题归档为标准项目资产包初稿的闭环。
+当前项目已经从“历史项目资产包生成工具”扩展为一个文件化工作台 MVP，用来支持外包项目从前期资料接入、信息对齐、全周期规划、阶段计划、阶段执行、阶段评审，到结题归档为标准项目资产包初稿的闭环。
 
 本仓库不放业务代码，只作为工作台模板和控制面使用。
 
@@ -24,7 +24,8 @@
    - 接入新项目的前期资料。
    - 生成信息对齐稿、项目启动清单、责任视角问题清单、资产包骨架和风险行动清单。
    - 人工确认项目上下文。
-   - 生成阶段计划和阶段目标。
+   - 生成项目全周期规划。
+   - 基于全周期规划生成阶段计划和阶段目标。
    - 让 Agent 按阶段执行开发任务、自检和测试。
    - 输出阶段报告和资产包更新。
    - 人工评审阶段结果。
@@ -78,6 +79,7 @@ python scripts/check_project_config.py --project sample-project
 ```powershell
 python scripts/init_project_workbench.py --project sample-project --no-claude --overwrite
 python scripts/confirm_project_context.py --project sample-project --decision confirmed --overwrite
+python scripts/plan_project_lifecycle.py --project sample-project --no-claude --overwrite
 python scripts/plan_project_stage.py --project sample-project --stage-id stage-1 --title "第一阶段" --no-claude --overwrite
 python scripts/run_project_stage.py --project sample-project --stage-id stage-1 --no-claude --overwrite
 python scripts/review_project_stage.py --project sample-project --stage-id stage-1 --decision approve --no-claude --overwrite
@@ -163,6 +165,12 @@ python scripts/init_project_workbench.py --project my-project
 python scripts/confirm_project_context.py --project my-project --decision confirmed
 ```
 
+生成项目全周期规划：
+
+```powershell
+python scripts/plan_project_lifecycle.py --project my-project
+```
+
 生成第一阶段计划：
 
 ```powershell
@@ -189,6 +197,18 @@ python scripts/run_project_stage.py --project my-project --stage-id stage-1 --al
 
 ```powershell
 python scripts/review_project_stage.py --project my-project --stage-id stage-1 --decision approve
+```
+
+阶段通过后，不要直接凭聊天继续做下一期。先检查全周期规划是否需要调整：
+
+```powershell
+python scripts/plan_project_lifecycle.py --project my-project --revision-reason "stage-1 评审后调整后续路线"
+```
+
+然后再基于最新全周期规划生成下一阶段计划：
+
+```powershell
+python scripts/plan_project_stage.py --project my-project --stage-id stage-2 --title "第二阶段"
 ```
 
 项目结题或阶段性归档时，生成标准资产包初稿：
@@ -256,6 +276,7 @@ python scripts/check_project_health.py --project my-project --period weekly
 
 - `/init-project-workbench`
 - `/resume-project-workbench`
+- `/plan-project-lifecycle`
 - `/plan-project-stage`
 - `/run-project-stage`
 - `/review-project-stage`
@@ -273,6 +294,7 @@ outputs/generated/workbench/my-project/
 |-- responsibility-questions.md
 |-- asset-pack-skeleton.md
 |-- risk-action-list.md
+|-- lifecycle-plan.md
 `-- resume-brief.md
 ```
 

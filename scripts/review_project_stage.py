@@ -59,6 +59,8 @@ def main() -> int:
     )
     if args.decision == "approve":
         state["last_approved_stage_id"] = args.stage_id
+        state["lifecycle_review_required"] = True
+        state["lifecycle_review_reason"] = f"Stage {args.stage_id} approved; check whether later lifecycle stages need adjustment."
     save_workbench_state(args.project, state)
 
     reviewed_workbench_dir(args.project).mkdir(parents=True, exist_ok=True)
