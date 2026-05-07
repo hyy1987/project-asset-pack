@@ -5,7 +5,7 @@ status: sample
 workbench:
   mode: asset-pack-and-agent-first
   pre_project_materials: examples/sample-project/pre-project
-  allow_code_changes: false
+  allow_code_changes: true
   default_stage_id: stage-1
   default_stage_title: 第一阶段目标待填写
 owners:

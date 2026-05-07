@@ -2,82 +2,197 @@
 
 基于 Claude Code 的项目资产包生成、评审、增量更新和 Agent-First 软件外包项目工作台。
 
-本目录不放业务代码，只负责：
+当前项目已经从“历史项目资产包生成工具”扩展为一个文件化工作台 MVP，用来支持外包项目从前期资料接入、信息对齐、阶段计划、阶段执行、阶段评审，到结题归档为标准项目资产包初稿的闭环。
 
-- Claude Code 配置
-- 项目接入配置
-- 项目资产包模板
-- 安全边界规则
-- `/init-asset-pack`、`/update-asset-pack`、`/review-asset-pack`、`/check-project-health` skills
-- `/init-project-workbench`、`/plan-project-stage`、`/run-project-stage`、`/review-project-stage`、`/finalize-workbench-asset-pack`、`/ask-project-info` skills
-- AI 生成结果、人工评审结果、项目体检报告和阶段评审记录
+本仓库不放业务代码，只作为工作台模板和控制面使用。
 
-## MVP 目标：项目资产包
+## 当前状态
 
-资产包第一版跑通一个闭环：
+已实现三条能力线：
 
-1. 接入一个历史项目的代码仓库和资料目录。
-2. 使用 Claude Code 执行 `/init-asset-pack`。
-3. 生成项目现状审查报告、资产包初稿、资料缺口清单、风险清单和可复用资产候选。
-4. 保存当前远程仓库基线。
-5. 后续检测远程仓库更新，安全同步本地仓库，并增量更新资产包初稿。
-6. 由人工评审后，输出正式资产包。
-7. 对在研项目或维护项目执行定期体检。
+1. **历史项目资产包**
+   - 接入已有项目代码仓库和资料目录。
+   - 生成项目现状审查报告、资产包初稿、资料缺口、风险清单和可复用资产候选。
+   - 支持人工评审后输出正式资产包。
 
-## MVP 目标：Agent-First 项目工作台
+2. **在研项目增量更新和体检**
+   - 保存代码仓库远程基线。
+   - 检测仓库更新并增量更新资产包初稿。
+   - 对在研项目或维护项目执行项目体检。
 
-工作台第一版跑通一个闭环：
+3. **Agent-First 项目工作台**
+   - 接入新项目的前期资料。
+   - 生成信息对齐稿、项目启动清单、责任视角问题清单、资产包骨架和风险行动清单。
+   - 人工确认项目上下文。
+   - 生成阶段计划和第一阶段目标。
+   - 让 Agent 按阶段执行开发任务、自检和测试。
+   - 输出阶段报告和资产包更新。
+   - 人工评审阶段结果。
+   - 评审通过后进入下一阶段。
+   - 项目结题或阶段性归档时，把工作台过程资料归档为标准项目资产包初稿。
 
-1. 接入新项目的前期资料。
-2. 生成信息对齐稿、项目启动清单、责任视角问题清单、资产包骨架和风险行动清单。
-3. 人工确认项目上下文。
-4. 生成阶段计划和第一阶段目标。
-5. Agent 按阶段执行开发任务、自检和测试。
-6. 输出阶段报告和资产包更新。
-7. 人工评审代码结果、测试结果、风险和资产包更新。
-8. 评审通过后进入下一阶段。
-9. 项目结题时，把工作台过程资料归档为标准项目资产包初稿。
+## 目录结构
 
-## 快速开始
+```text
+project-asset-pack/
+├── .claude/                  Claude Code 配置和 skills
+├── configs/                  项目接入配置和安全规则
+├── docs/                     使用手册、人工补充和评审意见
+├── examples/                 可提交的示例项目材料
+├── inputs/                   真实项目前期资料输入区，默认不提交
+├── outputs/                  AI 初稿、人工评审结果和发布产物，默认不提交
+├── scripts/                  自动化脚本
+├── templates/                资产包和工作台输出模板
+└── workspace/                状态、日志和快照，默认不提交
+```
 
-1. 复制本地配置示例：
+## 快速验证 sample-project
+
+仓库内置了一个可直接测试的示例材料目录：
+
+```text
+examples/sample-project/pre-project/
+```
+
+`configs/projects/sample-project.yaml` 已经指向这个目录。
+
+先复制 Claude Code 本地配置示例：
 
 ```powershell
 Copy-Item .claude/settings.local.example.json .claude/settings.local.json
 ```
 
-2. 按实际项目修改：
-
-- `.claude/settings.local.json`
-- `configs/projects/sample-project.yaml`
-
-`sample-project` 只是占位示例。第一次使用前，建议复制一份项目配置并改成真实项目 ID：
+检查示例配置：
 
 ```powershell
-Copy-Item configs/projects/sample-project.yaml configs/projects/my-project.yaml
+python scripts/check_project_config.py --project sample-project
 ```
 
-下文以 `my-project` 作为真实项目 ID 示例。
+`sample-project` 的业务代码仓库路径是占位示例，缺失路径会以 warning 形式提示；这不影响前期资料工作台流程验证。
 
-3. 从本目录启动 Claude Code：
+### 离线验证
+
+不调用 Claude Code，只验证目录、模板和状态推进：
+
+```powershell
+python scripts/init_project_workbench.py --project sample-project --no-claude --overwrite
+python scripts/confirm_project_context.py --project sample-project --decision confirmed --overwrite
+python scripts/plan_project_stage.py --project sample-project --stage-id stage-1 --title "第一阶段" --no-claude --overwrite
+python scripts/run_project_stage.py --project sample-project --stage-id stage-1 --no-claude --overwrite
+python scripts/review_project_stage.py --project sample-project --stage-id stage-1 --decision approve --no-claude --overwrite
+python scripts/finalize_workbench_asset_pack.py --project sample-project --no-claude --overwrite
+python scripts/check_project_workbench.py --project sample-project
+```
+
+### 使用 Claude Code 验证
+
+从本目录启动 Claude Code：
 
 ```powershell
 cd project-asset-pack
 claude
 ```
 
+在 Claude Code 会话中执行：
+
+```text
+/init-project-workbench sample-project
+```
+
+如果 slash command 没有识别，可以直接输入：
+
+```text
+请按 .claude/skills/init-project-workbench/SKILL.md 的规则，基于 configs/projects/sample-project.yaml 和 examples/sample-project/pre-project 生成 sample-project 的工作台初始化输出。
+```
+
+## Agent-First 工作台流程
+
+真实项目建议复制一份项目配置：
+
+```powershell
+Copy-Item configs/projects/sample-project.yaml configs/projects/my-project.yaml
+```
+
+把允许进入项目工作区的前期资料放到：
+
+```text
+inputs/pre-project/my-project/
+```
+
+并在 `configs/projects/my-project.yaml` 中配置：
+
+```yaml
+workbench:
+  pre_project_materials: inputs/pre-project/my-project
+  allow_code_changes: false
+```
+
+启动项目工作台：
+
+```powershell
+python scripts/init_project_workbench.py --project my-project
+```
+
+人工确认信息对齐结果：
+
+```powershell
+python scripts/confirm_project_context.py --project my-project --decision confirmed
+```
+
+生成第一阶段计划：
+
+```powershell
+python scripts/plan_project_stage.py --project my-project --stage-id stage-1 --title "第一阶段"
+```
+
+执行第一阶段：
+
+```powershell
+python scripts/run_project_stage.py --project my-project --stage-id stage-1
+```
+
+默认不修改业务项目仓库。需要 Agent 修改业务项目时，必须同时满足：
+
+- `configs/projects/my-project.yaml` 中 `workbench.allow_code_changes: true`
+- 阶段计划明确允许修改代码
+- 运行时加入人工授权参数
+
+```powershell
+python scripts/run_project_stage.py --project my-project --stage-id stage-1 --allow-code-changes
+```
+
+人工评审阶段结果：
+
+```powershell
+python scripts/review_project_stage.py --project my-project --stage-id stage-1 --decision approve
+```
+
+项目结题或阶段性归档时，生成标准资产包初稿：
+
+```powershell
+python scripts/finalize_workbench_asset_pack.py --project my-project
+```
+
+归档后继续走已有人工评审定稿流程：
+
+```powershell
+python scripts/review_asset_pack.py --project my-project
+```
+
+检查工作台状态：
+
+```powershell
+python scripts/check_project_workbench.py --project my-project
+```
+
 ## 项目资产包流程
+
+历史项目或已有项目可以直接走资产包流程。
 
 初始化资产包：
 
 ```text
 /init-asset-pack my-project
-```
-
-如果 skill 尚未被 Claude Code 识别，可以直接输入：
-
-```text
-请按 .claude/skills/init-asset-pack/SKILL.md 的规则，基于 configs/projects/my-project.yaml 生成项目资产包 MVP 输出。
 ```
 
 保存远程仓库基线：
@@ -104,169 +219,23 @@ python scripts/review_asset_pack.py --project my-project
 python scripts/check_project_health.py --project my-project --period weekly
 ```
 
-## Agent-First 工作台流程
+## Claude Code Skills
 
-1. 把允许进入项目工作区的前期资料放到：
+资产包相关：
 
-```text
-inputs/pre-project/my-project/
-```
+- `/init-asset-pack`
+- `/update-asset-pack`
+- `/review-asset-pack`
+- `/check-project-health`
 
-仓库内置了一个可直接测试的示例材料目录：
+工作台相关：
 
-```text
-examples/sample-project/pre-project/
-```
-
-`configs/projects/sample-project.yaml` 已经指向这个目录，可以直接用 `sample-project` 验证工作台流程。
-
-2. 启动项目工作台：
-
-```powershell
-python scripts/init_project_workbench.py --project my-project
-```
-
-只离线验证目录和模板，不调用 Claude Code：
-
-```powershell
-python scripts/init_project_workbench.py --project my-project --no-claude
-```
-
-3. 人工确认信息对齐结果：
-
-```powershell
-python scripts/confirm_project_context.py --project my-project --decision confirmed
-```
-
-4. 生成第一阶段计划：
-
-```powershell
-python scripts/plan_project_stage.py --project my-project --stage-id stage-1 --title "第一阶段"
-```
-
-5. 执行第一阶段：
-
-```powershell
-python scripts/run_project_stage.py --project my-project --stage-id stage-1
-```
-
-默认不修改业务项目仓库。需要 Agent 修改业务项目时，必须同时满足：
-
-- `configs/projects/my-project.yaml` 中 `workbench.allow_code_changes: true`
-- 阶段计划明确允许修改代码
-- 运行时加入人工授权参数
-
-```powershell
-python scripts/run_project_stage.py --project my-project --stage-id stage-1 --allow-code-changes
-```
-
-6. 人工评审阶段结果：
-
-```powershell
-python scripts/review_project_stage.py --project my-project --stage-id stage-1 --decision approve
-```
-
-7. 检查工作台状态：
-
-```powershell
-python scripts/check_project_workbench.py --project my-project
-```
-
-8. 项目结题或阶段性归档时，生成标准资产包初稿：
-
-```powershell
-python scripts/finalize_workbench_asset_pack.py --project my-project
-```
-
-只离线生成资产包初稿占位文件，不调用 Claude Code：
-
-```powershell
-python scripts/finalize_workbench_asset_pack.py --project my-project --no-claude
-```
-
-归档后继续走已有人工评审定稿流程：
-
-```powershell
-python scripts/review_asset_pack.py --project my-project
-```
-
-## 多项目和多团队使用方式
-
-当前结构支持一个工作台管理多个项目。
-
-`project-asset-pack` 更适合作为工作台模板和控制面，不建议把所有真实客户资料集中提交到同一个 Git 仓库。是否使用单工作台、多团队工作台或单项目工作台，应根据公司内部权限边界选择。
-
-对于小公司、小团队或一人公司，可以直接在同一个工作台中维护多个项目：
-
-```text
-configs/projects/project-a.yaml
-configs/projects/project-b.yaml
-inputs/pre-project/project-a/
-inputs/pre-project/project-b/
-outputs/generated/workbench/project-a/
-outputs/generated/workbench/project-b/
-outputs/reviewed/workbench/project-a/
-outputs/reviewed/workbench/project-b/
-workspace/workbench/project-a/
-workspace/workbench/project-b/
-```
-
-这种方式适合团队成员少、项目权限边界简单、由同一批人负责全部项目的场景。
-
-如果公司内有多个工作组，或者不同项目之间存在明显权限边界，建议不要把所有项目都放进同一个工作台实例。更稳妥的方式是按团队或按项目 fork 多个工作台：
-
-```text
-project-asset-pack-team-a/
-project-asset-pack-team-b/
-```
-
-或：
-
-```text
-project-asset-pack-project-a/
-project-asset-pack-project-b/
-```
-
-这样可以降低误改其他项目配置、误读其他项目资料、混提交不同项目变更的风险。
-
-建议原则：
-
-- 小团队：一个工作台管理多个项目。
-- 多团队：一个团队一个工作台。
-- 强隔离项目：一个项目一个工作台。
-- 通用脚本、skills、模板和安全规则进 Git。
-- 真实客户资料、AI 初稿、人工评审结果和运行状态默认不进 Git。
-
-## 项目资产包输出
-
-默认输出到：
-
-```text
-outputs/generated/my-project/
-├── review-report.md
-├── asset-pack-draft.md
-├── missing-materials.md
-├── risk-list.md
-└── reusable-assets.md
-```
-
-人工评审输出到：
-
-```text
-outputs/reviewed/my-project/
-├── asset-pack.md
-├── review-record.md
-├── approved-reusable-assets.md
-└── follow-up-actions.md
-```
-
-项目体检输出到：
-
-```text
-outputs/generated/project-health/my-project/
-├── weekly-health-check.md
-└── latest-health-check.md
-```
+- `/init-project-workbench`
+- `/plan-project-stage`
+- `/run-project-stage`
+- `/review-project-stage`
+- `/finalize-workbench-asset-pack`
+- `/ask-project-info`
 
 ## 工作台输出
 
@@ -317,6 +286,49 @@ outputs/generated/my-project/
 ```
 
 这些仍是 AI 初稿，必须经过 `review_asset_pack.py` 人工评审后才能进入 `outputs/reviewed/my-project/`。
+
+## 多项目和多团队使用方式
+
+当前结构支持一个工作台管理多个项目。
+
+`project-asset-pack` 更适合作为工作台模板和控制面，不建议把所有真实客户资料集中提交到同一个 Git 仓库。是否使用单工作台、多团队工作台或单项目工作台，应根据公司内部权限边界选择。
+
+小公司、小团队或一人公司，可以直接在同一个工作台中维护多个项目：
+
+```text
+configs/projects/project-a.yaml
+configs/projects/project-b.yaml
+inputs/pre-project/project-a/
+inputs/pre-project/project-b/
+outputs/generated/workbench/project-a/
+outputs/generated/workbench/project-b/
+outputs/reviewed/workbench/project-a/
+outputs/reviewed/workbench/project-b/
+workspace/workbench/project-a/
+workspace/workbench/project-b/
+```
+
+如果公司内有多个工作组，或者不同项目之间存在明显权限边界，建议按团队或按项目 fork 多个工作台：
+
+```text
+project-asset-pack-team-a/
+project-asset-pack-team-b/
+```
+
+或：
+
+```text
+project-asset-pack-project-a/
+project-asset-pack-project-b/
+```
+
+建议原则：
+
+- 小团队：一个工作台管理多个项目。
+- 多团队：一个团队一个工作台。
+- 强隔离项目：一个项目一个工作台。
+- 通用脚本、skills、模板和安全规则进 Git。
+- 真实客户资料、AI 初稿、人工评审结果和运行状态默认不进 Git。
 
 ## 安全原则
 
