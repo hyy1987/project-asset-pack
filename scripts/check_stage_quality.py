@@ -159,7 +159,7 @@ def main() -> int:
 
     validation_issues = []
     validation_issues.extend(validate_required_markdown(report_path, "Stage report"))
-    validation_issues.extend(validate_required_markdown(asset_update_path, "Asset pack update", allow_markers=True))
+    validation_issues.extend(validate_required_markdown(asset_update_path, "Asset pack update"))
     validation_issues.extend(command_issues)
     if args.run_commands:
         validation_issues.extend(validate_required_markdown(command_results_path, "Quality command results", allow_markers=True))

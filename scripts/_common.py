@@ -391,6 +391,7 @@ INCOMPLETE_MARKERS = (
     "待确认",
     "待检查",
     "待 Agent 填写",
+    "待 Agent",
     "待人工补充",
 )
 

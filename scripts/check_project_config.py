@@ -3,6 +3,8 @@ import json
 import re
 from pathlib import Path
 
+from _common import load_project_config
+
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -57,7 +59,8 @@ def main() -> int:
         return 1
 
     data = parse_simple_yaml(config_path)
-    rule_set = data.get("rule_set") or "default-outsourcing-project"
+    config = load_project_config(args.project)
+    rule_set = config.get("security", {}).get("rule_set") or "default-outsourcing-project"
     security_path = ROOT / "configs" / "security-rules" / f"{rule_set}.md"
 
     print(f"Project config: {config_path}")

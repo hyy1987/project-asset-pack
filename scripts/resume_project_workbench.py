@@ -107,14 +107,18 @@ def infer_next_action(state: dict[str, Any], stage_id: str | None) -> str:
         if stage.get("report"):
             return f"阶段 {current_stage_id or '待确认'} 已进入执行并已有报告草稿。下一步应补齐自检、测试、风险、资产包更新和质量门禁，然后提交人工评审。"
         return f"阶段 {current_stage_id or '待确认'} 已进入执行。下一步应生成阶段报告和资产包更新。"
+    if status == "stage-quality-checking":
+        return f"阶段 {current_stage_id or '待确认'} 已进入质量门禁检查。下一步应处理门禁问题；门禁明确允许后，再提交人工评审。"
     if status == "stage-review-required":
         return f"阶段 {current_stage_id or '待确认'} 未通过或仍需评审。下一步应根据评审意见返工。"
     if status == "stage-approved":
-        if stage and not stage.get("experience_notes"):
+        if stage and not stage.get("experience_updated_at"):
             return f"阶段 {state.get('last_approved_stage_id') or current_stage_id or '待确认'} 已通过评审，但缺少阶段经验沉淀。下一步应先沉淀阶段经验。"
         if not has_lifecycle_plan:
             return f"阶段 {state.get('last_approved_stage_id') or current_stage_id or '待确认'} 已通过评审，但缺少全周期规划。下一步应补生成全周期规划，再规划后续阶段。"
         return f"阶段 {state.get('last_approved_stage_id') or current_stage_id or '待确认'} 已通过评审。下一步应先检查并必要时修订全周期规划，再规划下一阶段或进行阶段性归档。"
+    if status == "stage-experience-summarized":
+        return f"阶段 {current_stage_id or state.get('last_approved_stage_id') or '待确认'} 的经验已沉淀。下一步应检查并必要时修订全周期规划，再规划下一阶段或进行阶段性归档。"
     if status == "asset-pack-draft-generated":
         return "工作台过程资料已归档为标准资产包初稿。下一步应执行人工资产包评审定稿。"
     return "请根据状态文件、已评审资料和当前阶段输出确认下一步。"

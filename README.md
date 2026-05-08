@@ -135,7 +135,7 @@ python scripts/init_project_workbench.py --project my-project --agent none
 
 ### 离线验证
 
-不调用 Agent 客户端，只验证目录、模板和状态推进：
+不调用 Agent 客户端，只验证目录、模板和状态推进。离线模式不会自动补全阶段报告、资产包更新和质量门禁，因此示例用 `changes-requested` 模拟人工发现问题；不要把它当作阶段通过演示。
 
 ```powershell
 python scripts/init_project_workbench.py --project sample-project --agent none --overwrite
@@ -143,13 +143,15 @@ python scripts/confirm_project_context.py --project sample-project --decision co
 python scripts/plan_project_lifecycle.py --project sample-project --agent none --overwrite
 python scripts/plan_project_stage.py --project sample-project --stage-id stage-1 --title "第一阶段" --agent none --overwrite
 python scripts/run_project_stage.py --project sample-project --stage-id stage-1 --agent none --overwrite
-python scripts/check_stage_quality.py --project sample-project --stage-id stage-1 --agent none --overwrite
-python scripts/review_project_stage.py --project sample-project --stage-id stage-1 --decision approve --agent none --overwrite
+python scripts/check_stage_quality.py --project sample-project --stage-id stage-1 --agent none --validate --overwrite
+python scripts/review_project_stage.py --project sample-project --stage-id stage-1 --decision changes-requested --agent none --overwrite
 python scripts/summarize_stage_experience.py --project sample-project --stage-id stage-1 --agent none --overwrite
 python scripts/resume_project_workbench.py --project sample-project --agent none --overwrite
 python scripts/finalize_workbench_asset_pack.py --project sample-project --agent none --overwrite
 python scripts/check_project_workbench.py --project sample-project
 ```
+
+如果要演示 `approve`，必须先由 Agent 或人工补齐阶段报告、阶段资产包更新和质量门禁，并确保质量门禁明确允许进入人工评审；只有确有人工例外时才使用 `--skip-quality-gate`。
 
 ### 使用 Claude Code 验证
 
@@ -376,7 +378,7 @@ python scripts/check_stage_quality.py --project my-project --stage-id stage-1 --
 python scripts/check_stage_quality.py --project my-project --stage-id stage-1 --agent none --run-commands --validate --strict
 ```
 
-脚本会检查阶段报告、阶段资产包更新和质量门禁是否仍有“待补充 / 待确认 / 待检查”等占位内容。质量门禁没有明确写成 `pass` 或 `warning`，且没有明确允许进入人工评审时，不能通过校验。
+脚本会检查阶段报告、阶段资产包更新和质量门禁是否仍有“待补充 / 待确认 / 待检查 / 待 Agent”等占位内容。质量门禁没有明确写成 `pass` 或 `warning`，且没有明确允许进入人工评审时，不能通过校验。
 
 如果项目配置了 `quality.commands`、`quality.runtime` 或 `quality.smoke`，脚本会实际执行构建、测试、检查、启动服务和冒烟请求，并把结果写入：
 

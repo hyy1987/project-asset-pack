@@ -19,6 +19,7 @@ from _common import (
     utc_now,
     validate_quality_gate_file,
     validate_quality_command_results,
+    validate_required_markdown,
     write_rendered_template,
 )
 
@@ -45,10 +46,18 @@ def main() -> int:
     title = args.title or stage.get("title") or args.stage_id
     quality_gate_path = stage_generated_dir(args.project, args.stage_id) / "quality-gate.md"
     if args.decision == "approve" and not args.skip_quality_gate:
-        quality_issues = validate_quality_gate_file(quality_gate_path)
+        stage_dir = stage_generated_dir(args.project, args.stage_id)
+        quality_issues = []
+        quality_issues.extend(validate_required_markdown(stage_dir / "stage-report.md", "Stage report"))
+        quality_issues.extend(validate_required_markdown(stage_dir / "asset-pack-update.md", "Asset pack update"))
+        quality_issues.extend(validate_quality_gate_file(quality_gate_path))
         quality_config = parse_quality_config(args.project)
-        quality_results_required = bool(quality_config.get("commands") or quality_config.get("smoke"))
-        quality_results_path = stage_generated_dir(args.project, args.stage_id) / "quality-command-results.md"
+        quality_results_required = bool(
+            quality_config.get("commands")
+            or quality_config.get("runtime")
+            or quality_config.get("smoke")
+        )
+        quality_results_path = stage_dir / "quality-command-results.md"
         quality_issues.extend(validate_quality_command_results(quality_results_path, required=quality_results_required))
         if quality_issues:
             print("Cannot approve stage because quality gate is incomplete:")

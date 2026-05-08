@@ -79,7 +79,7 @@ workbench:
 
 ## 离线验证
 
-如果当前机器没有 Agent 客户端，或只想离线验证，先使用 `--agent none` 验证目录、模板和状态推进：
+如果当前机器没有 Agent 客户端，或只想离线验证，先使用 `--agent none` 验证目录、模板和状态推进。离线模式不会自动补全阶段报告、资产包更新和质量门禁，因此示例用 `changes-requested` 模拟人工发现问题；不要把它当作阶段通过演示。
 
 ```powershell
 python scripts/check_project_config.py --project sample-project
@@ -88,10 +88,12 @@ python scripts/confirm_project_context.py --project sample-project --decision co
 python scripts/plan_project_lifecycle.py --project sample-project --agent none
 python scripts/plan_project_stage.py --project sample-project --stage-id stage-1 --title "第一阶段" --agent none
 python scripts/run_project_stage.py --project sample-project --stage-id stage-1 --agent none
-python scripts/check_stage_quality.py --project sample-project --stage-id stage-1 --agent none
-python scripts/review_project_stage.py --project sample-project --stage-id stage-1 --decision approve --agent none
+python scripts/check_stage_quality.py --project sample-project --stage-id stage-1 --agent none --validate
+python scripts/review_project_stage.py --project sample-project --stage-id stage-1 --decision changes-requested --agent none
 python scripts/summarize_stage_experience.py --project sample-project --stage-id stage-1 --agent none
 python scripts/resume_project_workbench.py --project sample-project --agent none --overwrite
 python scripts/finalize_workbench_asset_pack.py --project sample-project --agent none
 python scripts/check_project_workbench.py --project sample-project
 ```
+
+如果要离线演示 `approve`，必须先人工补齐阶段报告、阶段资产包更新和质量门禁，并确保质量门禁明确允许进入人工评审；只有确有人工例外时才使用 `--skip-quality-gate`。
