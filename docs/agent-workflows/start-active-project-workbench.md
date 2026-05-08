@@ -1,12 +1,12 @@
 # 接入在研项目工作台
 
-用于把正在进行中的项目直接接入 Agent-First 工作台。项目可以已经有资产包或体检报告，也可以只有项目配置、业务仓库和资料目录。
+用于把正在进行中的项目直接接入 Agent-First 工作台。项目可以已经有资产包，也可以只有项目配置、业务仓库和资料目录。
 
 ## 适用场景
 
 1. 项目已经在开发或维护中，后续希望用工作台管理阶段计划、开发执行、质量门禁和评审。
-2. 项目可能尚未生成资产包或体检报告，不要求先补做。
-3. 项目可能已有 `outputs/generated/<project_id>/`、`outputs/reviewed/<project_id>/` 或 `outputs/generated/project-health/<project_id>/`，这些只作为可选上下文。
+2. 项目可能尚未生成资产包，不要求先补做。
+3. 项目可能已有 `outputs/generated/<project_id>/` 或 `outputs/reviewed/<project_id>/`，这些只作为可选上下文。
 
 ## 输入
 
@@ -17,13 +17,12 @@
 5. 前期资料目录：`inputs/pre-project/<project_id>/` 或配置中声明的目录，如果存在
 6. 已有 AI 资产包初稿：`outputs/generated/<project_id>/`，如果存在
 7. 已有人工评审资产包：`outputs/reviewed/<project_id>/`，如果存在
-8. 已有项目体检报告：`outputs/generated/project-health/<project_id>/`，如果存在
-9. `templates/workbench/active-project-intake.md`
-10. `templates/workbench/info-alignment.md`
-11. `templates/workbench/project-kickoff-checklist.md`
-12. `templates/workbench/responsibility-questions.md`
-13. `templates/workbench/asset-pack-skeleton.md`
-14. `templates/workbench/risk-action-list.md`
+8. `templates/workbench/active-project-intake.md`
+9. `templates/workbench/info-alignment.md`
+10. `templates/workbench/project-kickoff-checklist.md`
+11. `templates/workbench/responsibility-questions.md`
+12. `templates/workbench/asset-pack-skeleton.md`
+13. `templates/workbench/risk-action-list.md`
 
 ## 输出
 
@@ -45,7 +44,7 @@ workspace/workbench/<project_id>/state.json
 
 ## 规则
 
-1. 不要求先生成资产包或项目体检；已有资产包和体检报告只是辅助上下文。
+1. 不要求先生成资产包；已有资产包只是辅助上下文。
 2. 对业务仓库只做状态盘点，不默认修改代码。
 3. 不把历史资料、AI 初稿或仓库推断直接写成已确认事实；必须标注“已确认”“待人工确认”“可能已过期”。
 4. 接入完成后，先人工确认接入摘要、信息对齐稿和风险行动清单。

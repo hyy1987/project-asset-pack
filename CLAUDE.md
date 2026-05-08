@@ -25,7 +25,7 @@ docs/agent-workflows/
 请按 docs/agent-workflows/init-project-workbench.md，启动 my-project 工作台。
 ```
 
-已有在研项目可以直接接入工作台，不要求先生成资产包或体检报告：
+已有在研项目可以直接接入工作台，不要求先生成资产包：
 
 ```text
 请按 docs/agent-workflows/start-active-project-workbench.md，把 my-project 这个在研项目接入工作台。

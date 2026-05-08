@@ -1,6 +1,6 @@
 ---
 name: start-active-project-workbench
-description: 将正在进行中的项目直接接入 Agent-First 工作台，用于后续阶段规划、开发执行和质量评审；不要求已有资产包或体检报告。
+description: 将正在进行中的项目直接接入 Agent-First 工作台，用于后续阶段规划、开发执行和质量评审；不要求已有资产包。
 allowed-tools: Read, Write, Edit, MultiEdit, Glob, Grep, LS
 ---
 

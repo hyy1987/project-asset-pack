@@ -62,10 +62,6 @@ def reviewed_asset_pack_dir(project_id: str) -> Path:
     return REPO_ROOT / config.get("output", {}).get("reviewed", f"outputs/reviewed/{project_id}")
 
 
-def health_check_dir(project_id: str) -> Path:
-    return REPO_ROOT / "outputs" / "generated" / "project-health" / project_id
-
-
 def repository_status_lines(project_id: str) -> tuple[list[str], list[dict[str, Any]]]:
     lines: list[str] = []
     records: list[dict[str, Any]] = []
@@ -124,7 +120,7 @@ def ensure_project_experience(project_id: str, source_files: list[str], overwrit
                 "",
                 "## 接入来源",
                 "",
-                format_list(source_files, "本次接入未发现已有资产包或体检报告，以上下文确认和业务仓库状态为主。"),
+                format_list(source_files, "本次接入未发现已有资产包，以上下文确认和业务仓库状态为主。"),
                 "",
                 "## 后续必须遵守",
                 "",
@@ -147,14 +143,12 @@ def main() -> int:
     material_dir = pre_project_materials_dir(args.project)
     generated_asset_dir = generated_asset_pack_dir(args.project)
     reviewed_asset_dir = reviewed_asset_pack_dir(args.project)
-    health_dir = health_check_dir(args.project)
 
     materials = list_material_files(args.project)
     repo_lines, repo_records = repository_status_lines(args.project)
     generated_asset_files = list_markdown_files(generated_asset_dir)
     reviewed_asset_files = list_markdown_files(reviewed_asset_dir)
-    health_files = list_markdown_files(health_dir)
-    source_files = [*reviewed_asset_files, *generated_asset_files, *health_files]
+    source_files = [*reviewed_asset_files, *generated_asset_files]
 
     values = {
         "project_id": args.project,
@@ -164,7 +158,6 @@ def main() -> int:
         "repository_list": format_list(repo_lines, "项目配置中未发现业务仓库。"),
         "generated_asset_pack_files": format_list(generated_asset_files, "未发现已有 AI 资产包初稿。"),
         "reviewed_asset_pack_files": format_list(reviewed_asset_files, "未发现人工评审后的资产包。"),
-        "health_check_files": format_list(health_files, "未发现项目体检报告。"),
     }
 
     created = [
@@ -186,11 +179,9 @@ def main() -> int:
         "adopted_at": utc_now(),
         "generated_asset_pack_dir": repo_relative(generated_asset_dir),
         "reviewed_asset_pack_dir": repo_relative(reviewed_asset_dir),
-        "health_check_dir": repo_relative(health_dir),
         "repositories": repo_records,
         "generated_asset_pack_files": generated_asset_files,
         "reviewed_asset_pack_files": reviewed_asset_files,
-        "health_check_files": health_files,
         "intake_summary": repo_relative(created[0]),
     }
     state["generated_outputs"] = sorted(set(state.get("generated_outputs", []) + [repo_relative(path) for path in created]))
@@ -202,7 +193,7 @@ def main() -> int:
     print(f"Active project intake: {created[0]}")
     print(f"Project experience file: {project_experience}")
     if not source_files:
-        print("No existing asset pack or health report found; continuing with project config, repositories, and materials.")
+        print("No existing asset pack found; continuing with project config, repositories, and materials.")
 
     agent = selected_agent(args)
     if agent == "none":
@@ -217,10 +208,9 @@ def main() -> int:
             f"Active project intake summary: outputs/generated/workbench/{args.project}/active-project-intake.md",
             f"Generated asset pack directory, optional: {repo_relative(generated_asset_dir)}",
             f"Reviewed asset pack directory, optional: {repo_relative(reviewed_asset_dir)}",
-            f"Project health directory, optional: {repo_relative(health_dir)}",
             f"Project experience file: {project_experience}",
             "Start an Agent-First workbench for an active in-progress project.",
-            "Asset packs and health reports are optional context, not prerequisites.",
+            "Existing asset packs are optional context, not prerequisites.",
             "Update info alignment, kickoff checklist, asset pack skeleton, risk/action list, and lifecycle planning inputs.",
             "Do not start stage development until lifecycle plan and next stage plan are generated or revised.",
         ],

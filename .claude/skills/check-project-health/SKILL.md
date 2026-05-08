@@ -1,6 +1,6 @@
 ---
 name: check-project-health
-description: 对正在开发或维护中的项目执行定期体检，检查项目资料沉淀、代码变化、测试缺陷和交付准备状态。
+description: 对未接入工作台的在研或维护项目执行定期体检，检查项目资料沉淀、代码变化、测试缺陷和交付准备状态。
 allowed-tools: Read, Write, Edit, MultiEdit, Glob, Grep, LS, Bash(git:*)
 ---
 

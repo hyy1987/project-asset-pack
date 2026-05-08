@@ -60,17 +60,16 @@ outputs/generated/workbench/<project_id>/resume-brief.md
 
 ## 在研项目直接接入
 
-如果项目已经在开发或维护中，现在要把后续工作切到工作台，不需要先补做资产包或项目体检。先确保 `configs/projects/<project_id>.yaml` 中的业务仓库和资料目录已经配置好，然后运行：
+如果项目已经在开发或维护中，现在要把后续工作切到工作台，不需要先补做资产包。先确保 `configs/projects/<project_id>.yaml` 中的业务仓库和资料目录已经配置好，然后运行：
 
 ```powershell
 python scripts/start_active_project_workbench.py --project <project_id>
 ```
 
-这个命令会读取项目配置、业务仓库状态和资料目录；如果存在，也会读取：
+这个命令会读取项目配置、业务仓库状态和资料目录；如果存在，也会读取已有资产包材料：
 
 - `outputs/generated/<project_id>/`
 - `outputs/reviewed/<project_id>/`
-- `outputs/generated/project-health/<project_id>/`
 
 并生成：
 

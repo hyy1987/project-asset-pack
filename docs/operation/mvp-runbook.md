@@ -75,7 +75,7 @@ AI 初稿不能直接作为正式资产包。
 
 ## 7. 保存远程仓库基线
 
-初次资产包生成完成后，保存当前远程仓库基线：
+仅对未接入 Agent-First 工作台的在研或维护项目使用。初次资产包生成完成后，保存当前远程仓库基线：
 
 ```powershell
 python scripts\save_remote_baseline.py --project my-project
@@ -166,7 +166,7 @@ outputs/reviewed/my-project/
 
 ## 12. 项目体检
 
-对在研项目或维护项目执行每周体检：
+仅对未接入 Agent-First 工作台的在研或维护项目执行每周体检。已接入工作台的项目，应通过阶段质量门禁、风险行动清单、CR 队列和阶段评审完成健康检查。
 
 ```powershell
 python scripts\check_project_health.py --project my-project --period weekly

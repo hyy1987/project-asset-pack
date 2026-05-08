@@ -1,6 +1,6 @@
 # Project Asset Pack
 
-支持 Claude Code 和 Codex 的项目资产包生成、评审、增量更新和 Agent-First 软件外包项目工作台。
+支持 Claude Code 和 Codex 的项目资产包生成、评审、在研项目辅助检查和 Agent-First 软件外包项目工作台。
 
 当前项目已经从“历史项目资产包生成工具”扩展为一个文件化工作台 MVP，用来支持外包项目从前期资料接入、信息对齐、全周期规划、阶段计划、阶段执行、质量门禁、阶段评审、经验沉淀，到结题归档为标准项目资产包初稿的闭环。
 
@@ -8,22 +8,16 @@
 
 ## 当前状态
 
-已实现三条能力线：
+已实现三类使用路径：
 
 1. **历史项目资产包**
    - 接入已有项目代码仓库和资料目录。
    - 生成项目现状审查报告、资产包初稿、资料缺口、风险清单和可复用资产候选。
    - 支持人工评审后输出正式资产包。
 
-2. **在研项目增量更新和体检**
-   - 保存代码仓库远程基线。
-   - 检测仓库更新并增量更新资产包初稿。
-   - 对在研项目或维护项目执行项目体检。
-   - 支持把正在开发或维护中的项目直接接入工作台，不要求先生成资产包或体检报告。
-
-3. **Agent-First 项目工作台**
-   - 接入新项目的前期资料。
-   - 接入已有在研项目的项目配置、业务仓库、资料目录和可选历史材料。
+2. **Agent-First 项目工作台**
+   - 支持两个并列入口：新项目从前期资料启动，在研项目从项目配置、业务仓库、资料目录和可选历史材料接入。
+   - 两个入口接入后，汇入同一套信息对齐、规划、阶段执行、质量门禁和评审流程。
    - 生成信息对齐稿、项目启动清单、责任视角问题清单、资产包骨架和风险行动清单。
    - 人工确认项目上下文。
    - 生成项目全周期规划。
@@ -36,6 +30,12 @@
    - 评审通过后进入下一阶段。
    - 项目结题或阶段性归档时，把工作台过程资料归档为标准项目资产包初稿。
    - 新 Agent 窗口可通过恢复摘要继续工作，避免重复初始化。
+
+3. **未接入工作台的在研项目辅助流程**
+   - 对暂不采用 Agent-First 工作台的在研或维护项目，保留资产包增量更新和项目体检。
+   - 这条路径不与工作台并行管理同一个项目；如果项目已经接入工作台，后续应以工作台为主。
+
+推荐原则：能接入工作台的在研项目走工作台；暂不采用 Agent-First 模式的在研项目，才使用资产包增量更新和体检作为轻量辅助。
 
 ## 目录结构
 
@@ -226,12 +226,12 @@ outputs/generated/workbench/my-project/resume-brief.md
 
 ## 在研项目直接接入工作台
 
-如果项目已经在开发或维护中，现在要把后续工作切到 Agent-First 工作台，不需要先补做资产包或项目体检。只要 `configs/projects/my-project.yaml` 已经配置好业务仓库、资料目录和安全规则，就可以直接接入：
+如果项目已经在开发或维护中，现在要把后续工作切到 Agent-First 工作台，不需要先补做资产包。只要 `configs/projects/my-project.yaml` 已经配置好业务仓库、资料目录和安全规则，就可以直接接入：
 
 自然语言：
 
 ```text
-请把 my-project 这个在研项目接入 Agent-First 工作台，读取项目配置、业务仓库状态、资料目录，以及可选的已有资产包和体检报告，生成接入摘要、信息对齐稿、风险行动清单和后续规划输入。
+请把 my-project 这个在研项目接入 Agent-First 工作台，读取项目配置、业务仓库状态、资料目录，以及可选的已有资产包，生成接入摘要、信息对齐稿、风险行动清单和后续规划输入。
 ```
 
 快捷命令：
@@ -246,12 +246,11 @@ outputs/generated/workbench/my-project/resume-brief.md
 python scripts/start_active_project_workbench.py --project my-project
 ```
 
-脚本会优先读取项目配置中的业务仓库和资料目录；如果已有下面这些材料，也会作为可选上下文读取：
+脚本会优先读取项目配置中的业务仓库和资料目录；如果已有下面这些资产包材料，也会作为可选上下文读取：
 
 ```text
 outputs/generated/my-project/
 outputs/reviewed/my-project/
-outputs/generated/project-health/my-project/
 ```
 
 接入输出包括：
@@ -625,7 +624,7 @@ python scripts/check_project_workbench.py --project my-project
 
 ## 项目资产包流程
 
-历史项目或已有项目可以直接走资产包流程。
+历史项目、交接项目或未接入工作台的项目可以直接走资产包流程。在研项目一旦接入工作台，就不要再单独走资产包更新流程；阶段性归档时使用 `finalize_workbench_asset_pack.py` 从工作台产物生成资产包初稿。
 
 ### 初始化资产包
 
@@ -643,13 +642,15 @@ python scripts/check_project_workbench.py --project my-project
 
 ### 保存远程仓库基线
 
-保存远程仓库基线：
+仅用于未接入工作台的在研或维护项目。保存远程仓库基线：
 
 ```powershell
 python scripts/save_remote_baseline.py --project my-project
 ```
 
 ### 增量更新资产包
+
+仅用于未接入工作台的在研或维护项目。
 
 自然语言：
 
@@ -689,7 +690,9 @@ python scripts/update_asset_pack.py --project my-project
 python scripts/review_asset_pack.py --project my-project
 ```
 
-### 在研项目或维护项目体检
+### 未接入工作台项目体检
+
+仅用于未接入工作台的在研或维护项目。已经接入工作台的项目，应通过阶段质量门禁、风险行动清单、CR 队列和阶段评审完成健康检查。
 
 自然语言：
 
@@ -737,6 +740,9 @@ Claude Code 快捷命令：
 - `/init-asset-pack`
 - `/update-asset-pack`
 - `/review-asset-pack`
+
+未接入工作台的在研项目辅助：
+
 - `/check-project-health`
 
 工作台相关：

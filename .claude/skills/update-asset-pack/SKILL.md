@@ -1,6 +1,6 @@
 ---
 name: update-asset-pack
-description: 对比已记录的远程仓库基线和当前同步后的项目仓库版本，按变化范围增量更新项目资产包。
+description: 对未接入工作台的在研或维护项目，对比远程仓库基线和当前同步后的项目仓库版本，按变化范围增量更新项目资产包。
 allowed-tools: Read, Write, Edit, MultiEdit, Glob, Grep, LS, Bash(git:*), Bash(python:*)
 ---
 
