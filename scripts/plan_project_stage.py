@@ -72,8 +72,11 @@ def main() -> int:
             f"Stage title: {args.title}",
             f"Security rule set: {project_security_rule_set(args.project)}",
             f"Lifecycle plan: {lifecycle_plan}",
+            f"Material intake index, if any: outputs/generated/workbench/{args.project}/material-intake/index.md",
+            f"Change request index, if any: outputs/generated/workbench/{args.project}/change-requests/index.md",
             f"Stage plan output: outputs/generated/workbench/{args.project}/stages/{args.stage_id}/stage-plan.md",
             "Stage plan must follow the lifecycle plan. If the lifecycle plan is missing or outdated, ask to create or revise it first.",
+            "Only include change requests in this stage when their status and target stage are human-confirmed.",
         ],
         label=f"Plan stage {args.stage_id} for {args.project}",
     )

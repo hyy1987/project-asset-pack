@@ -273,6 +273,69 @@ python scripts/plan_project_stage.py --project my-project --stage-id stage-next 
 
 之后再按常规工作台流程执行阶段开发、质量门禁、人工评审和经验沉淀。
 
+## 新资料和需求变更接入
+
+开发过程中，甲方可能随时发送新需求文档、会议纪要、补充说明或直接在聊天里提出新需求。这些内容可以在聊天窗口中触发处理，但必须落到工作台文件中，不能只停留在聊天记录里。
+
+### 1. 接入新资料
+
+建议把甲方新发资料放到：
+
+```text
+inputs/project-updates/my-project/
+```
+
+然后记录资料接入：
+
+```powershell
+python scripts/record_material_intake.py --project my-project --source inputs/project-updates/my-project/2026-05-08-new-prd.md --title "新版本需求文档" --material-type requirement-doc
+```
+
+输出到：
+
+```text
+outputs/generated/workbench/my-project/material-intake/
+|-- MI-2026-001.md
+`-- index.md
+```
+
+Agent 应在资料接入记录中补充资料摘要、影响范围、待确认问题，并判断是否需要生成需求变更记录。
+
+### 2. 记录需求变更
+
+如果新资料或聊天内容包含新增需求、范围变化或验收标准变化，记录为 CR：
+
+```powershell
+python scripts/record_change_request.py --project my-project --title "新增导出功能" --source MI-2026-001 --material-id MI-2026-001 --stage-id stage-1 --request-type new-requirement
+```
+
+输出到：
+
+```text
+outputs/generated/workbench/my-project/change-requests/
+|-- CR-2026-001.md
+`-- index.md
+```
+
+CR 默认只是进入变更队列，不等于马上开发。人工评审后再决定：
+
+- `accepted-current-stage`：进入当前阶段，必须更新当前阶段计划和质量门禁。
+- `accepted-future-stage`：进入后续阶段，必须更新全周期规划或后续阶段计划。
+- `needs-clarification`：需要甲方或内部进一步确认。
+- `rejected`：不纳入交付范围。
+- `done`：已完成并在阶段评审中通过。
+
+### 3. 进入开发流程
+
+需求变更被接受后，再更新规划：
+
+```powershell
+python scripts/plan_project_lifecycle.py --project my-project --revision-reason "纳入 CR-2026-001"
+python scripts/plan_project_stage.py --project my-project --stage-id stage-1 --title "第一阶段修订"
+```
+
+阶段报告必须回写本阶段处理过的 CR 编号、实现结果、测试证据和遗留问题。
+
 ## Agent-First 工作台流程
 
 真实项目建议复制一份项目配置：
@@ -681,6 +744,8 @@ Claude Code 快捷命令：
 - `/start-active-project-workbench`
 - `/init-project-workbench`
 - `/resume-project-workbench`
+- `/record-material-intake`
+- `/record-change-request`
 - `/plan-project-lifecycle`
 - `/plan-project-stage`
 - `/run-project-stage`

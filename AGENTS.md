@@ -30,6 +30,14 @@ Codex 没有 Claude Code 的 slash command 时，使用自然语言引用 workfl
 ```
 
 ```text
+按 docs/agent-workflows/record-material-intake.md，把新资料接入 my-project 工作台。
+```
+
+```text
+按 docs/agent-workflows/record-change-request.md，把甲方新需求记录到 my-project 的变更队列。
+```
+
+```text
 按 docs/agent-workflows/run-project-stage.md，执行 my-project 的 stage-1。
 ```
 

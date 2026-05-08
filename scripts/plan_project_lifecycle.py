@@ -63,7 +63,10 @@ def main() -> int:
         f"Project id: {args.project}",
         f"Security rule set: {project_security_rule_set(args.project)}",
         f"Lifecycle plan output: outputs/generated/workbench/{args.project}/lifecycle-plan.md",
+        f"Material intake index, if any: outputs/generated/workbench/{args.project}/material-intake/index.md",
+        f"Change request index, if any: outputs/generated/workbench/{args.project}/change-requests/index.md",
         "Generate a full project lifecycle plan before planning individual stages.",
+        "Read material intake and change request indexes before revising scope or stage roadmap.",
         "The lifecycle plan must guide all later stage plans.",
     ]
     if args.revision_reason:

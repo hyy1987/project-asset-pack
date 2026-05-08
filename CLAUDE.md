@@ -36,6 +36,8 @@ docs/agent-workflows/
 ```text
 /init-project-workbench my-project
 /start-active-project-workbench my-project
+/record-material-intake my-project inputs/project-updates/my-project/new-prd.md
+/record-change-request my-project 新增导出功能
 ```
 
 新窗口、上下文丢失或中途恢复时，如果 `workspace/workbench/<project_id>/state.json` 存在，不要提示用户重新初始化。先读取：

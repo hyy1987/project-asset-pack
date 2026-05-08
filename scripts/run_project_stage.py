@@ -91,10 +91,13 @@ def main() -> int:
             f"Project config allows code changes: {config_allows}",
             f"Human explicitly authorized code changes for this run: {args.allow_code_changes}",
             f"Effective code changes authorized: {code_changes_authorized}",
+            f"Material intake index, if any: outputs/generated/workbench/{args.project}/material-intake/index.md",
+            f"Change request index, if any: outputs/generated/workbench/{args.project}/change-requests/index.md",
             f"Stage plan: outputs/generated/workbench/{args.project}/stages/{args.stage_id}/stage-plan.md",
             f"Stage report output: outputs/generated/workbench/{args.project}/stages/{args.stage_id}/stage-report.md",
             f"Asset pack update output: outputs/generated/workbench/{args.project}/stages/{args.stage_id}/asset-pack-update.md",
             f"Quality gate output: outputs/generated/workbench/{args.project}/stages/{args.stage_id}/quality-gate.md",
+            "Do not implement new change requests unless they are explicitly included in the approved stage plan.",
         ],
         label=f"Run stage {args.stage_id} for {args.project}",
     )

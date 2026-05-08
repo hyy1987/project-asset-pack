@@ -8,6 +8,7 @@ workspace/logs/*
 workspace/workbench/*
 workspace/snapshots/*
 inputs/pre-project/*
+inputs/project-updates/*
 outputs/generated/*
 outputs/reviewed/*
 outputs/publish/*
@@ -15,6 +16,7 @@ outputs/publish/*
 !workspace/workbench/.gitkeep
 !workspace/snapshots/.gitkeep
 !inputs/pre-project/.gitkeep
+!inputs/project-updates/.gitkeep
 !outputs/generated/.gitkeep
 !outputs/reviewed/.gitkeep
 !outputs/publish/.gitkeep

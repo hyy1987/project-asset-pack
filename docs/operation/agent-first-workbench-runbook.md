@@ -89,6 +89,34 @@ python scripts/plan_project_stage.py --project <project_id> --stage-id stage-nex
 
 然后继续执行阶段开发、质量门禁、人工评审和经验沉淀。
 
+## 新资料和需求变更
+
+新资料先进入资料接入记录，不直接改变阶段范围：
+
+```powershell
+python scripts/record_material_intake.py --project <project_id> --source inputs/project-updates/<project_id>/<file> --title "资料标题" --material-type requirement-doc
+```
+
+如果资料或聊天内容包含新增需求、需求变更、范围变化或验收标准变化，再记录 CR：
+
+```powershell
+python scripts/record_change_request.py --project <project_id> --title "需求标题" --source MI-2026-001 --material-id MI-2026-001
+```
+
+资料接入输出：
+
+```text
+outputs/generated/workbench/<project_id>/material-intake/
+```
+
+需求变更输出：
+
+```text
+outputs/generated/workbench/<project_id>/change-requests/
+```
+
+CR 进入队列后，不要直接开发。必须先人工确认状态和目标阶段；进入当前阶段时更新阶段计划，进入后续阶段时更新全周期规划。
+
 任意一步中断后，都可以先运行：
 
 ```powershell

@@ -32,6 +32,8 @@ Claude Code、Codex 或其他 Agent 客户端都应读取这里的规则。`.cla
 
 正在进行中的项目可以从“在研项目接入工作台”开始，先生成接入摘要和工作台上下文，再进入全周期规划和下一阶段计划。这个入口不要求项目已有资产包或体检报告。
 
+新资料和新需求进入项目时，必须先记录到工作台文件：资料进入 `material-intake/`，需求变化进入 `change-requests/`。聊天窗口可以触发流程，但不能作为唯一留痕。
+
 默认一个 Agent 作为阶段开发执行者。多人合作主要进入阶段计划确认、阶段评审和验收授权，不建议多个 Agent 终端同时推进同一阶段开发。
 
 ## 读取顺序
@@ -62,6 +64,8 @@ Claude Code、Codex 或其他 Agent 客户端都应读取这里的规则。`.cla
 - 工作台状态：`workspace/workbench/<project_id>/state.json`
 - 项目经验库：`workspace/workbench/<project_id>/project-experience.md`
 - 新窗口恢复摘要：`outputs/generated/workbench/<project_id>/resume-brief.md`
+- 新资料接入：`outputs/generated/workbench/<project_id>/material-intake/`
+- 需求变更队列：`outputs/generated/workbench/<project_id>/change-requests/`
 
 AI 输出只能作为初稿。正式材料必须经过人工评审后进入 `outputs/reviewed/`。
 

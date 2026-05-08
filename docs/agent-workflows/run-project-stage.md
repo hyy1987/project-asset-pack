@@ -9,10 +9,12 @@
 3. 已确认的项目信息或人工确认记录
 4. `outputs/generated/workbench/<project_id>/lifecycle-plan.md`
 5. `outputs/generated/workbench/<project_id>/stages/<stage_id>/stage-plan.md`
-6. `workspace/workbench/<project_id>/project-experience.md`，如果存在
-7. 已接入的业务项目仓库和资料目录
-8. `templates/workbench/stage-report.md`
-9. `templates/workbench/quality-gate.md`
+6. `outputs/generated/workbench/<project_id>/material-intake/index.md`，如果存在
+7. `outputs/generated/workbench/<project_id>/change-requests/index.md`，如果存在
+8. `workspace/workbench/<project_id>/project-experience.md`，如果存在
+9. 已接入的业务项目仓库和资料目录
+10. `templates/workbench/stage-report.md`
+11. `templates/workbench/quality-gate.md`
 
 ## 输出
 
@@ -40,3 +42,4 @@ outputs/generated/workbench/<project_id>/stages/<stage_id>/quality-gate.md
 10. 同步生成或更新阶段质量门禁，明确测试证据、未验证内容和人工必须检查项。
 11. 不得绕过质量门禁和人工评审进入下一阶段。
 12. 不建议多个 Agent 终端同时推进同一阶段开发；多人主要在计划确认和阶段评审时进入。
+13. 不得实现未纳入阶段计划的 CR；如执行中出现新需求，先记录 CR，再等待人工确认是否调整阶段计划。

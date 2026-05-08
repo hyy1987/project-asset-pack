@@ -78,6 +78,32 @@ def build_stage_summary(state: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
+def build_material_summary(state: dict[str, Any]) -> str:
+    materials = state.get("material_intake", [])
+    if not materials:
+        return "- 尚未发现资料接入记录。"
+    lines: list[str] = []
+    for item in materials:
+        lines.append(
+            f"- {item.get('material_id', '待确认')}：{item.get('title', '待确认')}，"
+            f"类型 {item.get('material_type', '待确认')}，状态 {item.get('status', 'recorded')}，记录 {item.get('record', '待确认')}"
+        )
+    return "\n".join(lines)
+
+
+def build_change_request_summary(state: dict[str, Any]) -> str:
+    requests = state.get("change_requests", [])
+    if not requests:
+        return "- 尚未发现需求变更记录。"
+    lines: list[str] = []
+    for item in requests:
+        lines.append(
+            f"- {item.get('request_id', '待确认')}：{item.get('title', '待确认')}，"
+            f"状态 {item.get('status', 'new')}，目标阶段 {item.get('target_stage', '待评审')}，记录 {item.get('record', '待确认')}"
+        )
+    return "\n".join(lines)
+
+
 def infer_next_action(state: dict[str, Any], stage_id: str | None) -> str:
     status = state.get("status", "new")
     current_stage_id = stage_id or state.get("current_stage_id")
@@ -95,6 +121,10 @@ def infer_next_action(state: dict[str, Any], stage_id: str | None) -> str:
         return "项目上下文已确认。下一步应先生成项目全周期规划，再生成第一阶段计划。"
     if status == "active-project-adopted":
         return "在研项目已接入工作台。下一步应人工确认接入摘要、信息对齐稿和风险行动清单，并生成或修订全周期规划，再规划下一阶段开发。"
+    if status == "material-intake-recorded":
+        return "新资料已接入工作台。下一步应分析资料影响，确认是否需要生成需求变更；如果影响范围或阶段计划，先人工确认再更新规划。"
+    if status == "change-request-recorded":
+        return "需求变更已进入队列。下一步应人工评审 CR 状态和目标阶段；确认后再更新全周期规划或阶段计划，不要直接开发。"
     if status == "lifecycle-planned":
         if state.get("last_approved_stage_id"):
             return f"全周期规划已更新，最近通过阶段为 {state.get('last_approved_stage_id')}。下一步应基于最新全周期规划生成下一阶段计划。"
@@ -155,6 +185,8 @@ def main() -> int:
         "reviewed_outputs": format_list(list_markdown_files(reviewed_dir), "尚未发现人工评审或确认输出。"),
         "generated_outputs": format_list(list_markdown_files(generated_dir), "尚未发现 AI 初稿输出。"),
         "stage_summary": build_stage_summary(state),
+        "material_summary": build_material_summary(state),
+        "change_request_summary": build_change_request_summary(state),
         "next_action": infer_next_action(state, stage_id or None),
     }
 

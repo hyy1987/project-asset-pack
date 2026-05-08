@@ -33,6 +33,14 @@
 
 {{stage_summary}}
 
+## 新资料接入
+
+{{material_summary}}
+
+## 需求变更队列
+
+{{change_request_summary}}
+
 ## 阶段质量和经验规则
 
 1. 阶段执行后，先补齐质量门禁，再进入人工评审。

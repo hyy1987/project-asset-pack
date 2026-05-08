@@ -10,8 +10,10 @@
 4. `outputs/generated/workbench/<project_id>/project-kickoff-checklist.md`
 5. `outputs/generated/workbench/<project_id>/lifecycle-plan.md`
 6. `outputs/reviewed/workbench/<project_id>/human-confirmation.md`，如果存在
-7. `workspace/workbench/<project_id>/project-experience.md`，如果存在
-8. `templates/workbench/stage-plan.md`
+7. `outputs/generated/workbench/<project_id>/material-intake/index.md`，如果存在
+8. `outputs/generated/workbench/<project_id>/change-requests/index.md`，如果存在
+9. `workspace/workbench/<project_id>/project-experience.md`，如果存在
+10. `templates/workbench/stage-plan.md`
 
 ## 输出
 
@@ -34,3 +36,4 @@ outputs/generated/workbench/<project_id>/stages/<stage_id>/stage-plan.md
 7. 默认不允许直接修改业务仓库，除非项目配置和人工确认明确允许。
 8. 如果全周期规划缺失或过期，先要求生成或修订全周期规划。
 9. 如果项目经验库存在，必须把相关经验转成本阶段质量要求、测试要求和禁止重复的问题。
+10. 只有人工确认进入本阶段的 CR 才能纳入阶段计划；未确认 CR 只能列为待评审或后续候选。

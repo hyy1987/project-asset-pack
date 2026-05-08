@@ -11,8 +11,10 @@
 5. `outputs/generated/workbench/<project_id>/risk-action-list.md`
 6. `outputs/reviewed/workbench/<project_id>/human-confirmation.md`，如果存在
 7. 已有 `outputs/generated/workbench/<project_id>/lifecycle-plan.md`，如果是修订
-8. 已有阶段报告和阶段评审记录，如果是阶段后修订
-9. `templates/workbench/lifecycle-plan.md`
+8. `outputs/generated/workbench/<project_id>/material-intake/index.md`，如果存在
+9. `outputs/generated/workbench/<project_id>/change-requests/index.md`，如果存在
+10. 已有阶段报告和阶段评审记录，如果是阶段后修订
+11. `templates/workbench/lifecycle-plan.md`
 
 ## 输出
 
@@ -33,3 +35,4 @@ outputs/generated/workbench/<project_id>/lifecycle-plan.md
 5. 不得绕过人工评审把后续阶段视为已授权。
 6. 如果是修订规划，说明修订原因、影响范围和后续阶段变化。
 7. 后续阶段计划必须服从最新全周期规划。
+8. 已人工确认进入后续阶段的 CR 必须进入全周期规划；未确认 CR 只能作为待评审候选。
