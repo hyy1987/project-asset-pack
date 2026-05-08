@@ -86,7 +86,9 @@ def main() -> int:
                 f"  - 状态：{stage.get('status', '待确认')}",
                 f"  - 计划：{stage.get('plan', '待确认')}",
                 f"  - 报告：{stage.get('report', '待确认')}",
+                f"  - 质量门禁：{stage.get('quality_gate', '待确认')}",
                 f"  - 评审：{stage.get('review', '待确认')}",
+                f"  - 阶段经验：{stage.get('experience_notes', '待确认')}",
             ]
         )
     archive_summary = f"""# 工作台结题归档摘要
@@ -103,6 +105,8 @@ def main() -> int:
 - 当前阶段：{state.get('current_stage_id', '待确认')}
 - 最近通过阶段：{state.get('last_approved_stage_id', '待确认')}
 - 全周期规划：{state.get('lifecycle_plan', '待确认')}
+- 项目经验库：{state.get('project_experience', '待确认')}
+- 长期规则候选：{state.get('rule_candidates', '待确认')}
 
 ## 前期资料
 
@@ -114,6 +118,8 @@ def main() -> int:
 - 工作台人工确认与评审：{repo_relative(workbench_reviewed)}
 - 工作台状态文件：workspace/workbench/{args.project}/state.json
 - 全周期规划文件：{state.get('lifecycle_plan', '待确认')}
+- 项目经验库：{state.get('project_experience', '待确认')}
+- 长期规则候选：{state.get('rule_candidates', '待确认')}
 
 ## 阶段记录
 

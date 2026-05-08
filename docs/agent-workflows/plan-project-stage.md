@@ -10,7 +10,8 @@
 4. `outputs/generated/workbench/<project_id>/project-kickoff-checklist.md`
 5. `outputs/generated/workbench/<project_id>/lifecycle-plan.md`
 6. `outputs/reviewed/workbench/<project_id>/human-confirmation.md`，如果存在
-7. `templates/workbench/stage-plan.md`
+7. `workspace/workbench/<project_id>/project-experience.md`，如果存在
+8. `templates/workbench/stage-plan.md`
 
 ## 输出
 
@@ -32,3 +33,4 @@ outputs/generated/workbench/<project_id>/stages/<stage_id>/stage-plan.md
 6. 列出 Agent 执行步骤、自检与测试要求、阶段交付物。
 7. 默认不允许直接修改业务仓库，除非项目配置和人工确认明确允许。
 8. 如果全周期规划缺失或过期，先要求生成或修订全周期规划。
+9. 如果项目经验库存在，必须把相关经验转成本阶段质量要求、测试要求和禁止重复的问题。

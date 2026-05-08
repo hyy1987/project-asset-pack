@@ -157,7 +157,9 @@ python scripts/confirm_project_context.py --project sample-project --decision co
 python scripts/plan_project_lifecycle.py --project sample-project --agent none --overwrite
 python scripts/plan_project_stage.py --project sample-project --stage-id stage-1 --title "第一阶段" --agent none --overwrite
 python scripts/run_project_stage.py --project sample-project --stage-id stage-1 --agent none --overwrite
+python scripts/check_stage_quality.py --project sample-project --stage-id stage-1 --agent none --overwrite
 python scripts/review_project_stage.py --project sample-project --stage-id stage-1 --decision approve --agent none --overwrite
+python scripts/summarize_stage_experience.py --project sample-project --stage-id stage-1 --agent none --overwrite
 python scripts/finalize_workbench_asset_pack.py --project sample-project --agent none --overwrite
 python scripts/check_project_workbench.py --project sample-project
 ```

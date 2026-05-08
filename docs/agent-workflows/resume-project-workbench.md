@@ -11,7 +11,9 @@
 5. `outputs/generated/workbench/<project_id>/lifecycle-plan.md`
 6. `outputs/generated/workbench/<project_id>/`
 7. 当前阶段的 `stage-plan.md`、`stage-report.md`、`asset-pack-update.md`
-8. `outputs/generated/workbench/<project_id>/resume-brief.md`
+8. 当前阶段的 `quality-gate.md` 和 `experience-notes.md`，如果存在
+9. `workspace/workbench/<project_id>/project-experience.md`，如果存在
+10. `outputs/generated/workbench/<project_id>/resume-brief.md`
 
 ## 输出
 
@@ -28,4 +30,6 @@ outputs/generated/workbench/<project_id>/resume-brief.md
 3. `outputs/generated/` 中的内容只视为 AI 初稿。
 4. 明确告诉用户当前状态、当前阶段、已有产物、缺口和下一步建议。
 5. 如果全周期规划缺失，优先建议生成全周期规划。
-6. 如果阶段通过评审，先建议检查并必要时修订全周期规划，再规划下一阶段或归档。
+6. 如果阶段执行完成但质量门禁缺失，优先建议补做质量门禁。
+7. 如果阶段通过评审但经验沉淀缺失，优先建议沉淀阶段经验。
+8. 如果阶段通过评审，先建议检查并必要时修订全周期规划，再规划下一阶段或归档。

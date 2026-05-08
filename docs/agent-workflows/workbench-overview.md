@@ -10,7 +10,7 @@ Claude Code、Codex 或其他 Agent 客户端都应读取这里的规则。`.cla
 
 1. 历史项目资产包：生成项目现状审查、资产包初稿、资料缺口、风险清单和可复用资产候选。
 2. 在研项目更新与体检：保存远程基线、增量更新资产包、生成项目体检报告。
-3. Agent-First 项目工作台：从前期资料接入，到信息对齐、全周期规划、阶段计划、阶段执行、人工评审和归档。
+3. Agent-First 项目工作台：从前期资料接入，到信息对齐、全周期规划、阶段计划、阶段执行、质量门禁、人工评审、经验沉淀和归档。
 
 ## 工作台主线
 
@@ -22,7 +22,9 @@ Claude Code、Codex 或其他 Agent 客户端都应读取这里的规则。`.cla
  -> 阶段计划
  -> 单 Agent 阶段执行
  -> 阶段报告和资产包更新
+ -> 阶段质量门禁
  -> 人工评审
+ -> 阶段经验沉淀
  -> 检查/修订全周期规划
  -> 下一阶段或结题归档
 ```
@@ -40,17 +42,19 @@ Claude Code、Codex 或其他 Agent 客户端都应读取这里的规则。`.cla
 5. `inputs/pre-project/<project_id>/` 或配置中声明的前期资料目录
 6. `outputs/reviewed/workbench/<project_id>/` 中已经人工确认的信息
 7. `outputs/generated/workbench/<project_id>/lifecycle-plan.md`，如果存在
-8. `outputs/generated/workbench/<project_id>/` 中的 AI 初稿和阶段输出
-9. 对应任务的 `docs/agent-workflows/*.md`
-10. `templates/**`
-11. 已通过 Agent 客户端接入的业务仓库和资料目录
-12. 用户在当前会话中补充的说明
+8. `workspace/workbench/<project_id>/project-experience.md`，如果存在
+9. `outputs/generated/workbench/<project_id>/` 中的 AI 初稿和阶段输出
+10. 对应任务的 `docs/agent-workflows/*.md`
+11. `templates/**`
+12. 已通过 Agent 客户端接入的业务仓库和资料目录
+13. 用户在当前会话中补充的说明
 
 ## 输出约定
 
 - AI 初稿：`outputs/generated/`
 - 人工评审结果：`outputs/reviewed/`
 - 工作台状态：`workspace/workbench/<project_id>/state.json`
+- 项目经验库：`workspace/workbench/<project_id>/project-experience.md`
 - 新窗口恢复摘要：`outputs/generated/workbench/<project_id>/resume-brief.md`
 
 AI 输出只能作为初稿。正式材料必须经过人工评审后进入 `outputs/reviewed/`。

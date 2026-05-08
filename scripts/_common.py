@@ -3,8 +3,11 @@ from __future__ import annotations
 import argparse
 import json
 import shutil
+import time
 import subprocess
 import sys
+import urllib.error
+import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -118,6 +121,174 @@ def workbench_allows_code_changes(project_id: str) -> bool:
     return value in {"true", "yes", "1", "on"}
 
 
+def parse_quality_config(project_id: str) -> dict[str, Any]:
+    text = read_project_config_text(project_id)
+    result: dict[str, Any] = {"commands": [], "runtime": [], "smoke": []}
+    section: str | None = None
+    current_item: dict[str, str] | None = None
+    current_list: str | None = None
+
+    for raw_line in text.splitlines():
+        if not raw_line.strip() or raw_line.strip().startswith("#"):
+            continue
+        indent = len(raw_line) - len(raw_line.lstrip(" "))
+        stripped = raw_line.strip()
+
+        if indent == 0 and stripped.endswith(":"):
+            section = stripped[:-1]
+            current_list = None
+            current_item = None
+            continue
+        if section != "quality":
+            continue
+
+        if indent == 2 and stripped.endswith(":"):
+            current_list = stripped[:-1]
+            current_item = None
+            continue
+        if current_list in {"commands", "runtime", "smoke"} and indent >= 4:
+            if stripped.startswith("- "):
+                current_item = {}
+                result[current_list].append(current_item)
+                remainder = stripped[2:].strip()
+                if ":" in remainder:
+                    key, value = remainder.split(":", 1)
+                    current_item[key.strip()] = value.strip().strip('"').strip("'")
+            elif current_item is not None and ":" in stripped:
+                key, value = stripped.split(":", 1)
+                current_item[key.strip()] = value.strip().strip('"').strip("'")
+
+    return result
+
+
+def run_quality_command(command: dict[str, str]) -> dict[str, Any]:
+    name = command.get("name") or command.get("id") or "unnamed"
+    raw = command.get("run", "")
+    cwd = command.get("cwd", ".")
+    if not raw:
+        return {"name": name, "status": "failed", "reason": "missing run command"}
+    workdir = (REPO_ROOT / cwd).resolve()
+    if not workdir.exists():
+        return {"name": name, "command": raw, "cwd": repo_relative(workdir), "status": "failed", "reason": "cwd missing"}
+    completed = subprocess.run(
+        raw,
+        cwd=workdir,
+        shell=True,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        timeout=int(command.get("timeout_seconds", "300")),
+        check=False,
+    )
+    output = completed.stdout or ""
+    return {
+        "name": name,
+        "command": raw,
+        "cwd": repo_relative(workdir),
+        "status": "passed" if completed.returncode == 0 else "failed",
+        "returncode": completed.returncode,
+        "output_tail": output[-4000:],
+    }
+
+
+def check_http_url(url: str, expected_status: int, timeout: int) -> dict[str, Any]:
+    try:
+        with urllib.request.urlopen(url, timeout=timeout) as response:
+            actual_status = response.status
+            body = response.read(512).decode("utf-8", errors="replace")
+    except urllib.error.HTTPError as exc:
+        actual_status = exc.code
+        body = exc.read(512).decode("utf-8", errors="replace")
+    except Exception as exc:
+        return {"status": "failed", "reason": str(exc)}
+    return {
+        "expected_status": expected_status,
+        "actual_status": actual_status,
+        "status": "passed" if actual_status == expected_status else "failed",
+        "body_sample": body,
+    }
+
+
+def run_runtime_check(runtime: dict[str, str]) -> dict[str, Any]:
+    name = runtime.get("name") or runtime.get("id") or "runtime"
+    raw = runtime.get("start", "")
+    cwd = runtime.get("cwd", ".")
+    healthcheck = runtime.get("healthcheck", "")
+    expected_status = int(runtime.get("expect_status", "200"))
+    timeout_seconds = int(runtime.get("timeout_seconds", "60"))
+    if not raw:
+        return {"name": name, "status": "failed", "reason": "missing start command"}
+    if not healthcheck:
+        return {"name": name, "status": "failed", "reason": "missing healthcheck url"}
+    workdir = (REPO_ROOT / cwd).resolve()
+    if not workdir.exists():
+        return {"name": name, "command": raw, "cwd": repo_relative(workdir), "status": "failed", "reason": "cwd missing"}
+
+    process = subprocess.Popen(
+        raw,
+        cwd=workdir,
+        shell=True,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+    )
+    output_chunks: list[str] = []
+    started_at = time.time()
+    check_result: dict[str, Any] = {"status": "failed", "reason": "healthcheck not reached"}
+    try:
+        while time.time() - started_at < timeout_seconds:
+            if process.poll() is not None:
+                break
+            check_result = check_http_url(healthcheck, expected_status, timeout=5)
+            if check_result.get("status") == "passed":
+                break
+            time.sleep(2)
+        if process.stdout:
+            try:
+                output_chunks.append(process.stdout.read(4000))
+            except Exception:
+                pass
+    finally:
+        if process.poll() is None:
+            process.terminate()
+            try:
+                process.wait(timeout=10)
+            except subprocess.TimeoutExpired:
+                process.kill()
+
+    return {
+        "name": name,
+        "command": raw,
+        "cwd": repo_relative(workdir),
+        "healthcheck": healthcheck,
+        "expected_status": expected_status,
+        "status": "passed" if check_result.get("status") == "passed" else "failed",
+        "healthcheck_result": check_result,
+        "process_returncode": process.returncode,
+        "output_tail": "".join(output_chunks)[-4000:],
+    }
+
+
+def run_smoke_check(check: dict[str, str]) -> dict[str, Any]:
+    name = check.get("name") or check.get("url") or "unnamed"
+    url = check.get("url", "")
+    expected_status = int(check.get("expect_status", "200"))
+    timeout = int(check.get("timeout_seconds", "20"))
+    if not url:
+        return {"name": name, "status": "failed", "reason": "missing url"}
+    result = check_http_url(url, expected_status, timeout)
+    if result.get("status") == "failed" and "actual_status" not in result:
+        return {"name": name, "url": url, "status": "failed", "reason": result.get("reason", "unknown")}
+    return {
+        "name": name,
+        "url": url,
+        "expected_status": expected_status,
+        "actual_status": result.get("actual_status"),
+        "status": result.get("status"),
+        "body_sample": result.get("body_sample", ""),
+    }
+
+
 def generated_workbench_dir(project_id: str) -> Path:
     return REPO_ROOT / "outputs" / "generated" / "workbench" / project_id
 
@@ -128,6 +299,14 @@ def reviewed_workbench_dir(project_id: str) -> Path:
 
 def workbench_state_path(project_id: str) -> Path:
     return REPO_ROOT / "workspace" / "workbench" / project_id / "state.json"
+
+
+def project_experience_path(project_id: str) -> Path:
+    return REPO_ROOT / "workspace" / "workbench" / project_id / "project-experience.md"
+
+
+def rule_candidates_path(project_id: str) -> Path:
+    return generated_workbench_dir(project_id) / "rule-candidates.md"
 
 
 def stage_generated_dir(project_id: str, stage_id: str) -> Path:
@@ -205,6 +384,64 @@ def write_rendered_template(template_name: str, output_path: Path, values: dict[
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(render_template(template_path, values), encoding="utf-8")
     return output_path
+
+
+INCOMPLETE_MARKERS = (
+    "待补充",
+    "待确认",
+    "待检查",
+    "待 Agent 填写",
+    "待人工补充",
+)
+
+
+def read_text_if_exists(path: Path) -> str:
+    if not path.is_file():
+        return ""
+    return path.read_text(encoding="utf-8")
+
+
+def find_incomplete_markers(text: str) -> list[str]:
+    return [marker for marker in INCOMPLETE_MARKERS if marker in text]
+
+
+def validate_required_markdown(path: Path, label: str, allow_markers: bool = False) -> list[str]:
+    if not path.is_file():
+        return [f"{label} missing: {repo_relative(path)}"]
+    text = path.read_text(encoding="utf-8")
+    issues: list[str] = []
+    if not text.strip():
+        issues.append(f"{label} is empty: {repo_relative(path)}")
+    if not allow_markers:
+        markers = find_incomplete_markers(text)
+        if markers:
+            issues.append(f"{label} still contains incomplete placeholder text: {repo_relative(path)}")
+    return issues
+
+
+def validate_quality_gate_file(path: Path) -> list[str]:
+    issues = validate_required_markdown(path, "Quality gate")
+    if issues:
+        return issues
+    text = path.read_text(encoding="utf-8")
+    normalized = text.replace(" ", "")
+    if "门禁结论：pass" not in normalized and "门禁结论：warning" not in normalized:
+        issues.append("Quality gate conclusion must be pass or warning before approval.")
+    if "是否允许进入人工评审：是" not in normalized:
+        issues.append("Quality gate must explicitly allow human review.")
+    return issues
+
+
+def validate_quality_command_results(path: Path, required: bool) -> list[str]:
+    if not path.is_file():
+        return [f"Quality command results missing: {repo_relative(path)}"] if required else []
+    text = path.read_text(encoding="utf-8")
+    issues: list[str] = []
+    if "- 状态：failed" in text or "- 状态： failed" in text:
+        issues.append(f"Quality command results contain failed checks: {repo_relative(path)}")
+    if "Traceback " in text:
+        issues.append(f"Quality command results contain Python traceback: {repo_relative(path)}")
+    return issues
 
 
 def repo_relative(path: Path) -> str:

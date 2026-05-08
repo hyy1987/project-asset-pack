@@ -2,7 +2,7 @@
 
 支持 Claude Code 和 Codex 的项目资产包生成、评审、增量更新和 Agent-First 软件外包项目工作台。
 
-当前项目已经从“历史项目资产包生成工具”扩展为一个文件化工作台 MVP，用来支持外包项目从前期资料接入、信息对齐、全周期规划、阶段计划、阶段执行、阶段评审，到结题归档为标准项目资产包初稿的闭环。
+当前项目已经从“历史项目资产包生成工具”扩展为一个文件化工作台 MVP，用来支持外包项目从前期资料接入、信息对齐、全周期规划、阶段计划、阶段执行、质量门禁、阶段评审、经验沉淀，到结题归档为标准项目资产包初稿的闭环。
 
 本仓库不放业务代码，只作为工作台模板和控制面使用。
 
@@ -28,7 +28,9 @@
    - 基于全周期规划生成阶段计划和阶段目标。
    - 让 Agent 按阶段执行开发任务、自检和测试。
    - 输出阶段报告和资产包更新。
+   - 执行阶段质量门禁，检查测试证据、未验证内容和人工必须检查项。
    - 人工评审阶段结果。
+   - 沉淀阶段经验，更新项目经验库和长期规则候选。
    - 评审通过后进入下一阶段。
    - 项目结题或阶段性归档时，把工作台过程资料归档为标准项目资产包初稿。
    - 新 Agent 窗口可通过恢复摘要继续工作，避免重复初始化。
@@ -141,7 +143,9 @@ python scripts/confirm_project_context.py --project sample-project --decision co
 python scripts/plan_project_lifecycle.py --project sample-project --agent none --overwrite
 python scripts/plan_project_stage.py --project sample-project --stage-id stage-1 --title "第一阶段" --agent none --overwrite
 python scripts/run_project_stage.py --project sample-project --stage-id stage-1 --agent none --overwrite
+python scripts/check_stage_quality.py --project sample-project --stage-id stage-1 --agent none --overwrite
 python scripts/review_project_stage.py --project sample-project --stage-id stage-1 --decision approve --agent none --overwrite
+python scripts/summarize_stage_experience.py --project sample-project --stage-id stage-1 --agent none --overwrite
 python scripts/resume_project_workbench.py --project sample-project --agent none --overwrite
 python scripts/finalize_workbench_asset_pack.py --project sample-project --agent none --overwrite
 python scripts/check_project_workbench.py --project sample-project
@@ -344,7 +348,68 @@ python scripts/run_project_stage.py --project my-project --stage-id stage-1
 python scripts/run_project_stage.py --project my-project --stage-id stage-1 --allow-code-changes
 ```
 
-### 6. 评审阶段结果
+### 6. 检查阶段质量门禁
+
+阶段执行后，先做质量门禁。
+
+自然语言：
+
+```text
+请根据 my-project 的 stage-1 阶段计划、阶段报告、测试结果和资产包更新，检查阶段质量门禁，明确是否允许进入人工评审。
+```
+
+快捷命令：
+
+```text
+/check-stage-quality my-project stage-1
+```
+
+脚本：
+
+```powershell
+python scripts/check_stage_quality.py --project my-project --stage-id stage-1 --run-commands
+```
+
+如果只想做机器校验，不调用 Agent：
+
+```powershell
+python scripts/check_stage_quality.py --project my-project --stage-id stage-1 --agent none --run-commands --validate --strict
+```
+
+脚本会检查阶段报告、阶段资产包更新和质量门禁是否仍有“待补充 / 待确认 / 待检查”等占位内容。质量门禁没有明确写成 `pass` 或 `warning`，且没有明确允许进入人工评审时，不能通过校验。
+
+如果项目配置了 `quality.commands`、`quality.runtime` 或 `quality.smoke`，脚本会实际执行构建、测试、检查、启动服务和冒烟请求，并把结果写入：
+
+```text
+outputs/generated/workbench/my-project/stages/stage-1/quality-command-results.md
+```
+
+命令、启动检查或冒烟检查失败时，严格模式会阻止进入通过评审。
+
+配置示例：
+
+```yaml
+quality:
+  commands:
+    - name: frontend build
+      cwd: ../my-project/frontend
+      run: npm run build
+      timeout_seconds: 300
+  runtime:
+    - name: backend service
+      cwd: ../my-project/backend
+      start: npm run dev
+      healthcheck: http://127.0.0.1:8000/health
+      expect_status: 200
+      timeout_seconds: 60
+  smoke:
+    - name: api health
+      url: http://127.0.0.1:8000/health
+      expect_status: 200
+      timeout_seconds: 20
+```
+
+### 7. 评审阶段结果
 
 自然语言：
 
@@ -362,6 +427,26 @@ python scripts/run_project_stage.py --project my-project --stage-id stage-1 --al
 
 ```powershell
 python scripts/review_project_stage.py --project my-project --stage-id stage-1 --decision approve
+```
+
+`approve` 前会强制检查质量门禁。若确实需要人工例外，可以显式使用：
+
+```powershell
+python scripts/review_project_stage.py --project my-project --stage-id stage-1 --decision approve --skip-quality-gate
+```
+
+评审后沉淀阶段经验：
+
+```powershell
+python scripts/summarize_stage_experience.py --project my-project --stage-id stage-1
+```
+
+阶段经验会写入：
+
+```text
+outputs/generated/workbench/my-project/stages/stage-1/experience-notes.md
+workspace/workbench/my-project/project-experience.md
+outputs/generated/workbench/my-project/rule-candidates.md
 ```
 
 阶段通过后，不要直接凭聊天继续做下一期。先检查全周期规划是否需要调整：
@@ -390,7 +475,7 @@ python scripts/plan_project_lifecycle.py --project my-project --revision-reason 
 python scripts/plan_project_stage.py --project my-project --stage-id stage-2 --title "第二阶段"
 ```
 
-### 7. 结题或阶段性归档
+### 8. 结题或阶段性归档
 
 自然语言：
 

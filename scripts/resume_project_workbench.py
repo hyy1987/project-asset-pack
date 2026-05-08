@@ -13,9 +13,11 @@ from _common import (
     list_material_files,
     load_workbench_state,
     pre_project_materials_dir,
+    project_experience_path,
     project_security_rule_set,
     repo_relative,
     reviewed_workbench_dir,
+    rule_candidates_path,
     selected_agent,
     save_workbench_state,
     utc_now,
@@ -65,10 +67,14 @@ def build_stage_summary(state: dict[str, Any]) -> str:
             lines.append(f"  - 阶段计划：{stage['plan']}")
         if stage.get("report"):
             lines.append(f"  - 阶段报告：{stage['report']}")
+        if stage.get("quality_gate"):
+            lines.append(f"  - 质量门禁：{stage['quality_gate']}")
         if stage.get("asset_pack_update"):
             lines.append(f"  - 资产包更新：{stage['asset_pack_update']}")
         if stage.get("review"):
             lines.append(f"  - 人工评审：{stage['review']}")
+        if stage.get("experience_notes"):
+            lines.append(f"  - 阶段经验：{stage['experience_notes']}")
     return "\n".join(lines)
 
 
@@ -96,12 +102,16 @@ def infer_next_action(state: dict[str, Any], stage_id: str | None) -> str:
             return "当前只有阶段计划，缺少全周期规划。下一步应先补生成项目全周期规划，再确认阶段计划。"
         return f"阶段 {current_stage_id or '待确认'} 已有计划。下一步应确认阶段目标，并在授权边界内执行阶段任务。"
     if status == "stage-running":
+        if stage.get("report") and not stage.get("quality_gate"):
+            return f"阶段 {current_stage_id or '待确认'} 已有报告草稿，但缺少质量门禁。下一步应先运行阶段质量门禁。"
         if stage.get("report"):
-            return f"阶段 {current_stage_id or '待确认'} 已进入执行并已有报告草稿。下一步应补齐自检、测试、风险和资产包更新，然后提交人工评审。"
+            return f"阶段 {current_stage_id or '待确认'} 已进入执行并已有报告草稿。下一步应补齐自检、测试、风险、资产包更新和质量门禁，然后提交人工评审。"
         return f"阶段 {current_stage_id or '待确认'} 已进入执行。下一步应生成阶段报告和资产包更新。"
     if status == "stage-review-required":
         return f"阶段 {current_stage_id or '待确认'} 未通过或仍需评审。下一步应根据评审意见返工。"
     if status == "stage-approved":
+        if stage and not stage.get("experience_notes"):
+            return f"阶段 {state.get('last_approved_stage_id') or current_stage_id or '待确认'} 已通过评审，但缺少阶段经验沉淀。下一步应先沉淀阶段经验。"
         if not has_lifecycle_plan:
             return f"阶段 {state.get('last_approved_stage_id') or current_stage_id or '待确认'} 已通过评审，但缺少全周期规划。下一步应补生成全周期规划，再规划后续阶段。"
         return f"阶段 {state.get('last_approved_stage_id') or current_stage_id or '待确认'} 已通过评审。下一步应先检查并必要时修订全周期规划，再规划下一阶段或进行阶段性归档。"
@@ -131,6 +141,8 @@ def main() -> int:
         "current_stage_id": str(stage_id or "待确认"),
         "last_approved_stage_id": str(state.get("last_approved_stage_id", "待确认")),
         "lifecycle_plan": str(state.get("lifecycle_plan", "未生成")),
+        "project_experience": repo_relative(project_experience_path(args.project)) if project_experience_path(args.project).exists() else "未生成",
+        "rule_candidates": repo_relative(rule_candidates_path(args.project)) if rule_candidates_path(args.project).exists() else "未生成",
         "state_file": repo_relative(state_path),
         "pre_project_materials": repo_relative(material_dir),
         "material_list": format_list(list_material_files(args.project), "未发现前期资料。"),
@@ -171,8 +183,10 @@ def main() -> int:
             f"Current stage id: {stage_id or '<none>'}",
             f"Current status: {state.get('status')}",
             f"Lifecycle plan: {state.get('lifecycle_plan', '<missing>')}",
+            f"Project experience: {repo_relative(project_experience_path(args.project)) if project_experience_path(args.project).exists() else '<missing>'}",
             "Do not initialize the workbench again if the state file exists.",
             "Read lifecycle plan before stage plans. If it is missing, tell the user to generate it before continuing stage work.",
+            "Read project experience before planning or running the next stage. If stage experience is missing after review, tell the user to summarize it first.",
             "Read reviewed outputs before generated outputs, then tell the user the current status and next action.",
         ],
         label=f"Resume Agent-First workbench for {args.project}",

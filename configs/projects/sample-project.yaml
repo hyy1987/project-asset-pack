@@ -39,6 +39,12 @@ documents:
     - ../sample-project/docs/delivery
 security:
   rule_set: default-outsourcing-project
+quality:
+  commands:
+    - name: config check
+      cwd: .
+      run: python scripts/check_project_config.py --project sample-project
+      timeout_seconds: 60
 output:
   generated: outputs/generated/sample-project
   reviewed: outputs/reviewed/sample-project

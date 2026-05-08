@@ -44,6 +44,7 @@ def main() -> int:
     }
     report_path = write_rendered_template("stage-report.md", out_dir / "stage-report.md", values, overwrite=args.overwrite)
     asset_update_path = out_dir / "asset-pack-update.md"
+    quality_gate_path = write_rendered_template("quality-gate.md", out_dir / "quality-gate.md", {**values, "asset_pack_update": repo_relative(asset_update_path)}, overwrite=args.overwrite)
     if not asset_update_path.exists() or args.overwrite:
         asset_update_path.write_text(
             f"# 阶段资产包更新\n\n项目 ID：{args.project}\n阶段 ID：{args.stage_id}\n生成时间：{utc_now()}\n\n待 Agent 根据阶段执行结果更新。\n",
@@ -66,11 +67,13 @@ def main() -> int:
             "status": "running",
             "report": repo_relative(report_path),
             "asset_pack_update": repo_relative(asset_update_path),
+            "quality_gate": repo_relative(quality_gate_path),
             "code_changes_authorized": code_changes_authorized,
         }
     )
     save_workbench_state(args.project, state)
     print(f"Created stage report scaffold: {report_path}")
+    print(f"Created quality gate scaffold: {quality_gate_path}")
     print(f"Code changes authorized: {code_changes_authorized}")
 
     agent = selected_agent(args)
@@ -91,6 +94,7 @@ def main() -> int:
             f"Stage plan: outputs/generated/workbench/{args.project}/stages/{args.stage_id}/stage-plan.md",
             f"Stage report output: outputs/generated/workbench/{args.project}/stages/{args.stage_id}/stage-report.md",
             f"Asset pack update output: outputs/generated/workbench/{args.project}/stages/{args.stage_id}/asset-pack-update.md",
+            f"Quality gate output: outputs/generated/workbench/{args.project}/stages/{args.stage_id}/quality-gate.md",
         ],
         label=f"Run stage {args.stage_id} for {args.project}",
     )

@@ -8,12 +8,17 @@ from _common import (
     add_agent_argument,
     invoke_agent_skill,
     load_workbench_state,
+    parse_quality_config,
     repo_relative,
     reviewed_workbench_dir,
+    rule_candidates_path,
     save_workbench_state,
     selected_agent,
+    stage_generated_dir,
     stage_reviewed_dir,
     utc_now,
+    validate_quality_gate_file,
+    validate_quality_command_results,
     write_rendered_template,
 )
 
@@ -28,6 +33,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--decision", required=True, choices=sorted(VALID_DECISIONS))
     parser.add_argument("--title", default="", help="Stage title; defaults to title recorded in workbench state.")
     add_agent_argument(parser)
+    parser.add_argument("--skip-quality-gate", action="store_true", help="Allow approval without a completed quality gate. Use only with explicit human exception.")
     parser.add_argument("--overwrite", action="store_true", help="Overwrite reviewed scaffold files.")
     return parser.parse_args()
 
@@ -37,6 +43,20 @@ def main() -> int:
     state = load_workbench_state(args.project)
     stage = state.get("stages", {}).get(args.stage_id, {})
     title = args.title or stage.get("title") or args.stage_id
+    quality_gate_path = stage_generated_dir(args.project, args.stage_id) / "quality-gate.md"
+    if args.decision == "approve" and not args.skip_quality_gate:
+        quality_issues = validate_quality_gate_file(quality_gate_path)
+        quality_config = parse_quality_config(args.project)
+        quality_results_required = bool(quality_config.get("commands") or quality_config.get("smoke"))
+        quality_results_path = stage_generated_dir(args.project, args.stage_id) / "quality-command-results.md"
+        quality_issues.extend(validate_quality_command_results(quality_results_path, required=quality_results_required))
+        if quality_issues:
+            print("Cannot approve stage because quality gate is incomplete:")
+            for issue in quality_issues:
+                print(f"- {issue}")
+            print("Fix quality gate, use decision changes-requested/blocked, or rerun with --skip-quality-gate for an explicit human exception.")
+            return 1
+
     out_dir = stage_reviewed_dir(args.project, args.stage_id)
     values = {
         "project_id": args.project,
@@ -46,6 +66,12 @@ def main() -> int:
         "decision": args.decision,
     }
     review_path = write_rendered_template("stage-review.md", out_dir / "stage-review.md", values, overwrite=args.overwrite)
+    experience_path = write_rendered_template(
+        "experience-notes.md",
+        stage_generated_dir(args.project, args.stage_id) / "experience-notes.md",
+        values,
+        overwrite=args.overwrite,
+    )
 
     state["status"] = "stage-approved" if args.decision == "approve" else "stage-review-required"
     state["current_stage_id"] = args.stage_id
@@ -56,9 +82,11 @@ def main() -> int:
             "title": title,
             "status": args.decision,
             "review": repo_relative(review_path),
+            "experience_notes": repo_relative(experience_path),
             "reviewed_at": utc_now(),
         }
     )
+    state["rule_candidates"] = repo_relative(rule_candidates_path(args.project))
     if args.decision == "approve":
         state["last_approved_stage_id"] = args.stage_id
         state["lifecycle_review_required"] = True
@@ -67,6 +95,7 @@ def main() -> int:
 
     reviewed_workbench_dir(args.project).mkdir(parents=True, exist_ok=True)
     print(f"Created stage review record: {review_path}")
+    print(f"Created stage experience scaffold: {experience_path}")
     print(f"Decision: {args.decision}")
 
     agent = selected_agent(args)
@@ -82,6 +111,7 @@ def main() -> int:
             f"Stage title: {title}",
             f"Human review decision: {args.decision}",
             f"Stage review output: outputs/reviewed/workbench/{args.project}/stages/{args.stage_id}/stage-review.md",
+            f"Stage experience output: outputs/generated/workbench/{args.project}/stages/{args.stage_id}/experience-notes.md",
         ],
         label=f"Review stage {args.stage_id} for {args.project}",
     )

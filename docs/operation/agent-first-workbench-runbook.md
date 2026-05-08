@@ -47,12 +47,14 @@ outputs/generated/workbench/<project_id>/resume-brief.md
 6. 运行 `python scripts/plan_project_stage.py --project <project_id> --stage-id stage-1 --title "第一阶段"`。
 7. 人工确认阶段目标。
 8. 运行 `python scripts/run_project_stage.py --project <project_id> --stage-id stage-1`。
-9. 人工评审阶段报告。
-10. 运行 `python scripts/review_project_stage.py --project <project_id> --stage-id stage-1 --decision approve`。
-11. 阶段通过后，检查并必要时修订全周期规划。
-12. 基于最新全周期规划生成下一阶段计划。
-13. 项目结题或阶段性归档时，运行 `python scripts/finalize_workbench_asset_pack.py --project <project_id>`。
-14. 运行 `python scripts/review_asset_pack.py --project <project_id>` 进行正式资产包评审定稿。
+9. 运行 `python scripts/check_stage_quality.py --project <project_id> --stage-id stage-1 --run-commands --validate --strict`，执行构建、测试、冒烟检查并检查质量门禁。
+10. 人工评审阶段报告和质量门禁。
+11. 运行 `python scripts/review_project_stage.py --project <project_id> --stage-id stage-1 --decision approve`。
+12. 运行 `python scripts/summarize_stage_experience.py --project <project_id> --stage-id stage-1`，沉淀阶段经验。
+13. 阶段通过后，检查并必要时修订全周期规划。
+14. 基于最新全周期规划和项目经验库生成下一阶段计划。
+15. 项目结题或阶段性归档时，运行 `python scripts/finalize_workbench_asset_pack.py --project <project_id>`。
+16. 运行 `python scripts/review_asset_pack.py --project <project_id>` 进行正式资产包评审定稿。
 
 默认工作方式是一个 Agent 作为阶段开发执行者。多人合作主要进入阶段计划确认、阶段评审和验收授权，不建议多个 Agent 终端同时推进同一阶段开发。
 
@@ -86,7 +88,9 @@ python scripts/confirm_project_context.py --project sample-project --decision co
 python scripts/plan_project_lifecycle.py --project sample-project --agent none
 python scripts/plan_project_stage.py --project sample-project --stage-id stage-1 --title "第一阶段" --agent none
 python scripts/run_project_stage.py --project sample-project --stage-id stage-1 --agent none
+python scripts/check_stage_quality.py --project sample-project --stage-id stage-1 --agent none
 python scripts/review_project_stage.py --project sample-project --stage-id stage-1 --decision approve --agent none
+python scripts/summarize_stage_experience.py --project sample-project --stage-id stage-1 --agent none
 python scripts/resume_project_workbench.py --project sample-project --agent none --overwrite
 python scripts/finalize_workbench_asset_pack.py --project sample-project --agent none
 python scripts/check_project_workbench.py --project sample-project
