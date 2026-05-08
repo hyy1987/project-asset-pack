@@ -25,10 +25,17 @@ docs/agent-workflows/
 请按 docs/agent-workflows/init-project-workbench.md，启动 my-project 工作台。
 ```
 
+已有在研项目可以直接接入工作台，不要求先生成资产包或体检报告：
+
+```text
+请按 docs/agent-workflows/start-active-project-workbench.md，把 my-project 这个在研项目接入工作台。
+```
+
 也可以使用 `.claude/skills/` 提供的快捷命令：
 
 ```text
 /init-project-workbench my-project
+/start-active-project-workbench my-project
 ```
 
 新窗口、上下文丢失或中途恢复时，如果 `workspace/workbench/<project_id>/state.json` 存在，不要提示用户重新初始化。先读取：

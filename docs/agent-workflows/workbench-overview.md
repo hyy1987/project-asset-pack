@@ -11,6 +11,7 @@ Claude Code、Codex 或其他 Agent 客户端都应读取这里的规则。`.cla
 1. 历史项目资产包：生成项目现状审查、资产包初稿、资料缺口、风险清单和可复用资产候选。
 2. 在研项目更新与体检：保存远程基线、增量更新资产包、生成项目体检报告。
 3. Agent-First 项目工作台：从前期资料接入，到信息对齐、全周期规划、阶段计划、阶段执行、质量门禁、人工评审、经验沉淀和归档。
+4. 在研项目接入工作台：把正在开发或维护中的项目直接转入工作台，用于后续阶段开发；已有资产包和体检报告只是可选上下文。
 
 ## 工作台主线
 
@@ -29,6 +30,8 @@ Claude Code、Codex 或其他 Agent 客户端都应读取这里的规则。`.cla
  -> 下一阶段或结题归档
 ```
 
+正在进行中的项目可以从“在研项目接入工作台”开始，先生成接入摘要和工作台上下文，再进入全周期规划和下一阶段计划。这个入口不要求项目已有资产包或体检报告。
+
 默认一个 Agent 作为阶段开发执行者。多人合作主要进入阶段计划确认、阶段评审和验收授权，不建议多个 Agent 终端同时推进同一阶段开发。
 
 ## 读取顺序
@@ -44,10 +47,13 @@ Claude Code、Codex 或其他 Agent 客户端都应读取这里的规则。`.cla
 7. `outputs/generated/workbench/<project_id>/lifecycle-plan.md`，如果存在
 8. `workspace/workbench/<project_id>/project-experience.md`，如果存在
 9. `outputs/generated/workbench/<project_id>/` 中的 AI 初稿和阶段输出
-10. 对应任务的 `docs/agent-workflows/*.md`
-11. `templates/**`
-12. 已通过 Agent 客户端接入的业务仓库和资料目录
-13. 用户在当前会话中补充的说明
+10. `outputs/reviewed/<project_id>/` 中已有的正式资产包，如果存在
+11. `outputs/generated/<project_id>/` 中已有的资产包初稿，如果存在
+12. `outputs/generated/project-health/<project_id>/` 中已有的体检报告，如果存在
+13. 对应任务的 `docs/agent-workflows/*.md`
+14. `templates/**`
+15. 已通过 Agent 客户端接入的业务仓库和资料目录
+16. 用户在当前会话中补充的说明
 
 ## 输出约定
 

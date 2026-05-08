@@ -19,9 +19,11 @@
    - 保存代码仓库远程基线。
    - 检测仓库更新并增量更新资产包初稿。
    - 对在研项目或维护项目执行项目体检。
+   - 支持把正在开发或维护中的项目直接接入工作台，不要求先生成资产包或体检报告。
 
 3. **Agent-First 项目工作台**
    - 接入新项目的前期资料。
+   - 接入已有在研项目的项目配置、业务仓库、资料目录和可选历史材料。
    - 生成信息对齐稿、项目启动清单、责任视角问题清单、资产包骨架和风险行动清单。
    - 人工确认项目上下文。
    - 生成项目全周期规划。
@@ -221,6 +223,55 @@ outputs/generated/workbench/my-project/resume-brief.md
 ```
 
 新窗口中的 Agent 应先读取这份恢复摘要，再继续阶段执行、阶段评审、全周期规划修订、下一阶段规划或归档。只有状态文件不存在，或人类明确要求重建，才重新初始化。
+
+## 在研项目直接接入工作台
+
+如果项目已经在开发或维护中，现在要把后续工作切到 Agent-First 工作台，不需要先补做资产包或项目体检。只要 `configs/projects/my-project.yaml` 已经配置好业务仓库、资料目录和安全规则，就可以直接接入：
+
+自然语言：
+
+```text
+请把 my-project 这个在研项目接入 Agent-First 工作台，读取项目配置、业务仓库状态、资料目录，以及可选的已有资产包和体检报告，生成接入摘要、信息对齐稿、风险行动清单和后续规划输入。
+```
+
+快捷命令：
+
+```text
+/start-active-project-workbench my-project
+```
+
+脚本：
+
+```powershell
+python scripts/start_active_project_workbench.py --project my-project
+```
+
+脚本会优先读取项目配置中的业务仓库和资料目录；如果已有下面这些材料，也会作为可选上下文读取：
+
+```text
+outputs/generated/my-project/
+outputs/reviewed/my-project/
+outputs/generated/project-health/my-project/
+```
+
+接入输出包括：
+
+```text
+outputs/generated/workbench/my-project/active-project-intake.md
+outputs/generated/workbench/my-project/info-alignment.md
+outputs/generated/workbench/my-project/risk-action-list.md
+workspace/workbench/my-project/state.json
+workspace/workbench/my-project/project-experience.md
+```
+
+接入后不要直接执行阶段开发。先人工确认 `active-project-intake.md`、`info-alignment.md` 和 `risk-action-list.md`，再生成或修订全周期规划：
+
+```powershell
+python scripts/plan_project_lifecycle.py --project my-project --revision-reason "在研项目接入工作台，规划后续开发"
+python scripts/plan_project_stage.py --project my-project --stage-id stage-next --title "后续开发阶段"
+```
+
+之后再按常规工作台流程执行阶段开发、质量门禁、人工评审和经验沉淀。
 
 ## Agent-First 工作台流程
 
@@ -627,6 +678,7 @@ Claude Code 快捷命令：
 
 工作台相关：
 
+- `/start-active-project-workbench`
 - `/init-project-workbench`
 - `/resume-project-workbench`
 - `/plan-project-lifecycle`
@@ -642,6 +694,7 @@ Claude Code 快捷命令：
 
 ```text
 outputs/generated/workbench/my-project/
+|-- active-project-intake.md
 |-- info-alignment.md
 |-- project-kickoff-checklist.md
 |-- responsibility-questions.md

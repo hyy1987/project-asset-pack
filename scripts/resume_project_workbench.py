@@ -93,6 +93,8 @@ def infer_next_action(state: dict[str, Any], stage_id: str | None) -> str:
         return "信息对齐仍需人工确认。请先补充或修正人工确认记录。"
     if status == "context-confirmed":
         return "项目上下文已确认。下一步应先生成项目全周期规划，再生成第一阶段计划。"
+    if status == "active-project-adopted":
+        return "在研项目已接入工作台。下一步应人工确认接入摘要、信息对齐稿和风险行动清单，并生成或修订全周期规划，再规划下一阶段开发。"
     if status == "lifecycle-planned":
         if state.get("last_approved_stage_id"):
             return f"全周期规划已更新，最近通过阶段为 {state.get('last_approved_stage_id')}。下一步应基于最新全周期规划生成下一阶段计划。"

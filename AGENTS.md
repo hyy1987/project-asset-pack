@@ -26,6 +26,10 @@ Codex 没有 Claude Code 的 slash command 时，使用自然语言引用 workfl
 ```
 
 ```text
+按 docs/agent-workflows/start-active-project-workbench.md，把 my-project 这个在研项目直接接入工作台。
+```
+
+```text
 按 docs/agent-workflows/run-project-stage.md，执行 my-project 的 stage-1。
 ```
 

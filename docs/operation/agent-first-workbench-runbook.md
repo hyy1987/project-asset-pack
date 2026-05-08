@@ -58,6 +58,37 @@ outputs/generated/workbench/<project_id>/resume-brief.md
 
 默认工作方式是一个 Agent 作为阶段开发执行者。多人合作主要进入阶段计划确认、阶段评审和验收授权，不建议多个 Agent 终端同时推进同一阶段开发。
 
+## 在研项目直接接入
+
+如果项目已经在开发或维护中，现在要把后续工作切到工作台，不需要先补做资产包或项目体检。先确保 `configs/projects/<project_id>.yaml` 中的业务仓库和资料目录已经配置好，然后运行：
+
+```powershell
+python scripts/start_active_project_workbench.py --project <project_id>
+```
+
+这个命令会读取项目配置、业务仓库状态和资料目录；如果存在，也会读取：
+
+- `outputs/generated/<project_id>/`
+- `outputs/reviewed/<project_id>/`
+- `outputs/generated/project-health/<project_id>/`
+
+并生成：
+
+- `outputs/generated/workbench/<project_id>/active-project-intake.md`
+- `outputs/generated/workbench/<project_id>/info-alignment.md`
+- `outputs/generated/workbench/<project_id>/risk-action-list.md`
+- `workspace/workbench/<project_id>/project-experience.md`
+- `workspace/workbench/<project_id>/state.json`
+
+接入完成后，不要直接进入阶段开发。先人工确认接入摘要、信息对齐稿和风险行动清单，再运行：
+
+```powershell
+python scripts/plan_project_lifecycle.py --project <project_id> --revision-reason "在研项目接入工作台，规划后续开发"
+python scripts/plan_project_stage.py --project <project_id> --stage-id stage-next --title "后续开发阶段"
+```
+
+然后继续执行阶段开发、质量门禁、人工评审和经验沉淀。
+
 任意一步中断后，都可以先运行：
 
 ```powershell
