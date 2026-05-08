@@ -17,9 +17,9 @@ Copy-Item configs/projects/sample-project.yaml configs/projects/my-project.yaml
 - `security.rule_set`
 - `output.generated`
 
-## 2. 准备 Claude Code 本地配置
+## 2. 准备 Agent 客户端配置
 
-复制：
+如果使用 Claude Code，复制：
 
 ```powershell
 Copy-Item .claude/settings.local.example.json .claude/settings.local.json
@@ -37,25 +37,29 @@ python scripts/check_project_config.py --project my-project
 
 这个脚本只检查配置和路径，不生成资产包。
 
-## 4. 启动 Claude Code
+## 4. 启动 Agent 客户端
+
+Claude Code：
 
 ```powershell
 cd project-asset-pack
 claude
 ```
 
+Codex 也从 `project-asset-pack` 目录启动，并读取 `AGENTS.md` 与 `docs/agent-workflows/`。
+
 ## 5. 生成资产包初稿
 
-在 Claude Code 会话中执行：
+在 Claude Code 会话中可以执行快捷命令：
 
 ```text
 /init-asset-pack my-project
 ```
 
-或使用自然语言：
+在 Claude Code 或 Codex 中，也可以使用自然语言：
 
 ```text
-请按 .claude/skills/init-asset-pack/SKILL.md 的规则，基于 configs/projects/my-project.yaml 生成项目资产包 MVP 输出。
+请按 docs/agent-workflows/init-asset-pack.md 的规则，基于 configs/projects/my-project.yaml 生成项目资产包 MVP 输出。
 ```
 
 ## 6. 人工评审
@@ -99,7 +103,7 @@ python scripts\save_remote_baseline.py --project my-project --no-fetch
 python scripts\update_asset_pack.py --project my-project --check-only
 ```
 
-这个命令会同步远程引用并在安全时快进本地仓库，但不会调用 Claude Code 更新资产包，也不会更新基线。
+这个命令会同步远程引用并在安全时快进本地仓库，但不会调用 Agent 客户端更新资产包，也不会更新基线。
 
 ## 9. 更新资产包
 
@@ -114,8 +118,8 @@ python scripts\update_asset_pack.py --project my-project
 1. 读取 `workspace/snapshots/my-project-repo-baseline.json`。
 2. 获取并同步远程最新提交。
 3. 计算基线 HEAD 到当前 HEAD 的提交和文件变化。
-4. 调用 `.claude/skills/update-asset-pack/SKILL.md`。
-5. 要求 Claude Code 只更新受影响的资产包章节。
+4. 调用对应 Agent 工作流。
+5. 要求 Agent 只更新受影响的资产包章节。
 6. 更新成功后记录新的仓库基线。
 
 如果没有检测到新提交，脚本会直接跳过，不重写资产包。

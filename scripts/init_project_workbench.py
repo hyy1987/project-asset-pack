@@ -5,15 +5,17 @@ import argparse
 import sys
 
 from _common import (
+    add_agent_argument,
     ensure_workbench_dirs,
     generated_workbench_dir,
-    invoke_claude_skill,
+    invoke_agent_skill,
     list_material_files,
     load_workbench_state,
     pre_project_materials_dir,
     project_security_rule_set,
     repo_relative,
     save_workbench_state,
+    selected_agent,
     utc_now,
     write_rendered_template,
 )
@@ -22,7 +24,7 @@ from _common import (
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Initialize Agent-First project workbench outputs.")
     parser.add_argument("--project", required=True, help="Project id, for example sample-project")
-    parser.add_argument("--no-claude", action="store_true", help="Only create scaffold files; do not invoke Claude Code.")
+    add_agent_argument(parser)
     parser.add_argument("--overwrite", action="store_true", help="Overwrite generated scaffold files.")
     return parser.parse_args()
 
@@ -62,10 +64,12 @@ def main() -> int:
     else:
         print("No pre-project material files detected yet.")
 
-    if args.no_claude:
+    agent = selected_agent(args)
+    if agent == "none":
         return 0
 
-    return invoke_claude_skill(
+    return invoke_agent_skill(
+        agent,
         ".claude/skills/init-project-workbench/SKILL.md",
         [
             f"Project id: {args.project}",

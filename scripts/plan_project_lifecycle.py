@@ -5,12 +5,14 @@ import argparse
 import sys
 
 from _common import (
+    add_agent_argument,
     generated_workbench_dir,
-    invoke_claude_skill,
+    invoke_agent_skill,
     load_workbench_state,
     project_security_rule_set,
     repo_relative,
     save_workbench_state,
+    selected_agent,
     utc_now,
     write_rendered_template,
 )
@@ -20,7 +22,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Generate or revise an Agent-First project lifecycle plan.")
     parser.add_argument("--project", required=True, help="Project id, for example sample-project")
     parser.add_argument("--revision-reason", default="", help="Why this lifecycle plan is being revised.")
-    parser.add_argument("--no-claude", action="store_true", help="Only create scaffold file; do not invoke Claude Code.")
+    add_agent_argument(parser)
     parser.add_argument("--overwrite", action="store_true", help="Overwrite generated lifecycle plan scaffold.")
     return parser.parse_args()
 
@@ -53,7 +55,8 @@ def main() -> int:
     save_workbench_state(args.project, state)
     print(f"Created lifecycle plan scaffold: {lifecycle_path}")
 
-    if args.no_claude:
+    agent = selected_agent(args)
+    if agent == "none":
         return 0
 
     context_lines = [
@@ -66,7 +69,8 @@ def main() -> int:
     if args.revision_reason:
         context_lines.append(f"Revision reason: {args.revision_reason}")
 
-    return invoke_claude_skill(
+    return invoke_agent_skill(
+        agent,
         ".claude/skills/plan-project-lifecycle/SKILL.md",
         context_lines,
         label=f"Plan project lifecycle for {args.project}",

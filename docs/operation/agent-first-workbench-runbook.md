@@ -14,9 +14,9 @@
 
 ## 新窗口恢复
 
-Claude Code 的聊天窗口历史可能会丢失，但工作台进度不应该依赖聊天记录。
+Agent 客户端的聊天窗口历史可能会丢失，但工作台进度不应该依赖聊天记录。
 
-如果重新打开 Claude Code，或者换了一个新窗口，不要直接重新初始化。先运行：
+如果重新打开 Claude Code、Codex，或者换了一个新窗口，不要直接重新初始化。先运行：
 
 ```powershell
 python scripts/resume_project_workbench.py --project <project_id>
@@ -35,7 +35,7 @@ python scripts/resume_project_workbench.py --project <project_id>
 outputs/generated/workbench/<project_id>/resume-brief.md
 ```
 
-新窗口中的 Claude Code 应先阅读 `resume-brief.md`，再决定继续阶段执行、进入阶段评审、修订全周期规划、规划下一阶段，还是进行阶段性归档。只有状态文件不存在，或人类明确要求重建，才重新初始化工作台。
+新窗口中的 Agent 应先阅读 `resume-brief.md`，再决定继续阶段执行、进入阶段评审、修订全周期规划、规划下一阶段，还是进行阶段性归档。只有状态文件不存在，或人类明确要求重建，才重新初始化工作台。
 
 ## 最小流程
 
@@ -77,17 +77,17 @@ workbench:
 
 ## 离线验证
 
-如果当前机器没有 Claude Code，先使用 `--no-claude` 验证目录、模板和状态推进：
+如果当前机器没有 Agent 客户端，或只想离线验证，先使用 `--agent none` 验证目录、模板和状态推进：
 
 ```powershell
 python scripts/check_project_config.py --project sample-project
-python scripts/init_project_workbench.py --project sample-project --no-claude
+python scripts/init_project_workbench.py --project sample-project --agent none
 python scripts/confirm_project_context.py --project sample-project --decision confirmed
-python scripts/plan_project_lifecycle.py --project sample-project --no-claude
-python scripts/plan_project_stage.py --project sample-project --stage-id stage-1 --title "第一阶段" --no-claude
-python scripts/run_project_stage.py --project sample-project --stage-id stage-1 --no-claude
-python scripts/review_project_stage.py --project sample-project --stage-id stage-1 --decision approve --no-claude
-python scripts/resume_project_workbench.py --project sample-project --no-claude --overwrite
-python scripts/finalize_workbench_asset_pack.py --project sample-project --no-claude
+python scripts/plan_project_lifecycle.py --project sample-project --agent none
+python scripts/plan_project_stage.py --project sample-project --stage-id stage-1 --title "第一阶段" --agent none
+python scripts/run_project_stage.py --project sample-project --stage-id stage-1 --agent none
+python scripts/review_project_stage.py --project sample-project --stage-id stage-1 --decision approve --agent none
+python scripts/resume_project_workbench.py --project sample-project --agent none --overwrite
+python scripts/finalize_workbench_asset_pack.py --project sample-project --agent none
 python scripts/check_project_workbench.py --project sample-project
 ```

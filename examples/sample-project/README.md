@@ -30,14 +30,14 @@ python scripts/init_project_workbench.py --project sample-project
 离线验证：
 
 ```powershell
-python scripts/init_project_workbench.py --project sample-project --no-claude --overwrite
+python scripts/init_project_workbench.py --project sample-project --agent none --overwrite
 ```
 
-## 在 VS Code 中使用 Claude Code
+## 在 VS Code 中使用 Agent 客户端
 
 1. 用 VS Code 打开 `project-asset-pack` 目录。
 
-2. 确认本地配置文件存在：
+2. 如果使用 Claude Code，确认本地配置文件存在：
 
 ```powershell
 Copy-Item .claude/settings.local.example.json .claude/settings.local.json
@@ -71,22 +71,30 @@ python scripts/check_project_config.py --project sample-project
 
 `sample-project` 使用占位代码仓库路径，缺失路径会以 warning 形式提示；这不影响前期资料工作台流程验证。
 
-5. 启动 Claude Code：
+5. 启动 Agent 客户端。
+
+Claude Code：
 
 ```powershell
 claude
 ```
 
-6. 在 Claude Code 会话中执行新项目工作台初始化：
+Codex：
+
+```powershell
+codex
+```
+
+6. 在 Claude Code 或 Codex 会话中执行新项目工作台初始化：
+
+```text
+请按 docs/agent-workflows/init-project-workbench.md 的规则，基于 configs/projects/sample-project.yaml 和 examples/sample-project/pre-project 生成 sample-project 的工作台初始化输出。
+```
+
+如果使用 Claude Code，也可以使用快捷命令：
 
 ```text
 /init-project-workbench sample-project
-```
-
-如果 Claude Code 没有识别 slash command，可以直接输入：
-
-```text
-请按 .claude/skills/init-project-workbench/SKILL.md 的规则，基于 configs/projects/sample-project.yaml 和 examples/sample-project/pre-project 生成 sample-project 的工作台初始化输出。
 ```
 
 7. 查看输出目录：
@@ -109,19 +117,31 @@ outputs/generated/workbench/sample-project/
 python scripts/confirm_project_context.py --project sample-project --decision confirmed
 ```
 
-9. 生成第一阶段计划：
+9. 生成全周期规划：
+
+```powershell
+python scripts/plan_project_lifecycle.py --project sample-project
+```
+
+或在 Agent 会话中输入：
+
+```text
+请按 docs/agent-workflows/plan-project-lifecycle.md 的规则，为 sample-project 生成全周期规划。
+```
+
+10. 生成第一阶段计划：
 
 ```powershell
 python scripts/plan_project_stage.py --project sample-project --stage-id stage-1 --title "第一阶段"
 ```
 
-或在 Claude Code 会话中输入：
+或在 Agent 会话中输入：
 
 ```text
-请按 .claude/skills/plan-project-stage/SKILL.md 的规则，为 sample-project 生成 stage-1 阶段计划，阶段标题为“第一阶段”。
+请按 docs/agent-workflows/plan-project-stage.md 的规则，为 sample-project 生成 stage-1 阶段计划，阶段标题为“第一阶段”。
 ```
 
-10. 离线检查工作台状态：
+11. 离线检查工作台状态：
 
 ```powershell
 python scripts/check_project_workbench.py --project sample-project
@@ -129,14 +149,15 @@ python scripts/check_project_workbench.py --project sample-project
 
 ## 离线验证命令
 
-如果只是验证目录、模板和状态推进，不需要调用 Claude Code，可以直接运行：
+如果只是验证目录、模板和状态推进，不需要调用 Agent 客户端，可以直接运行：
 
 ```powershell
-python scripts/init_project_workbench.py --project sample-project --no-claude --overwrite
+python scripts/init_project_workbench.py --project sample-project --agent none --overwrite
 python scripts/confirm_project_context.py --project sample-project --decision confirmed --overwrite
-python scripts/plan_project_stage.py --project sample-project --stage-id stage-1 --title "第一阶段" --no-claude --overwrite
-python scripts/run_project_stage.py --project sample-project --stage-id stage-1 --no-claude --overwrite
-python scripts/review_project_stage.py --project sample-project --stage-id stage-1 --decision approve --no-claude --overwrite
-python scripts/finalize_workbench_asset_pack.py --project sample-project --no-claude --overwrite
+python scripts/plan_project_lifecycle.py --project sample-project --agent none --overwrite
+python scripts/plan_project_stage.py --project sample-project --stage-id stage-1 --title "第一阶段" --agent none --overwrite
+python scripts/run_project_stage.py --project sample-project --stage-id stage-1 --agent none --overwrite
+python scripts/review_project_stage.py --project sample-project --stage-id stage-1 --decision approve --agent none --overwrite
+python scripts/finalize_workbench_asset_pack.py --project sample-project --agent none --overwrite
 python scripts/check_project_workbench.py --project sample-project
 ```

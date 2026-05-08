@@ -5,11 +5,13 @@ import argparse
 import sys
 
 from _common import (
-    invoke_claude_skill,
+    add_agent_argument,
+    invoke_agent_skill,
     load_workbench_state,
     project_security_rule_set,
     repo_relative,
     save_workbench_state,
+    selected_agent,
     stage_generated_dir,
     utc_now,
     workbench_allows_code_changes,
@@ -18,12 +20,12 @@ from _common import (
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Run an Agent-First project stage through Claude Code.")
+    parser = argparse.ArgumentParser(description="Run an Agent-First project stage through an Agent client.")
     parser.add_argument("--project", required=True, help="Project id, for example sample-project")
     parser.add_argument("--stage-id", required=True, help="Stage id, for example stage-1")
     parser.add_argument("--title", default="", help="Stage title; defaults to title recorded in workbench state.")
     parser.add_argument("--allow-code-changes", action="store_true", help="Pass explicit human authorization for code changes.")
-    parser.add_argument("--no-claude", action="store_true", help="Only create report scaffold; do not invoke Claude Code.")
+    add_agent_argument(parser)
     parser.add_argument("--overwrite", action="store_true", help="Overwrite generated scaffold files.")
     return parser.parse_args()
 
@@ -52,7 +54,7 @@ def main() -> int:
     code_changes_authorized = bool(args.allow_code_changes and config_allows)
     if args.allow_code_changes and not config_allows:
         print("Code changes were requested, but workbench.allow_code_changes is not true in project config.")
-        print("Claude will be instructed not to modify business repositories.")
+        print("The Agent client will be instructed not to modify business repositories.")
 
     state["status"] = "stage-running"
     state["current_stage_id"] = args.stage_id
@@ -71,10 +73,12 @@ def main() -> int:
     print(f"Created stage report scaffold: {report_path}")
     print(f"Code changes authorized: {code_changes_authorized}")
 
-    if args.no_claude:
+    agent = selected_agent(args)
+    if agent == "none":
         return 0
 
-    return invoke_claude_skill(
+    return invoke_agent_skill(
+        agent,
         ".claude/skills/run-project-stage/SKILL.md",
         [
             f"Project id: {args.project}",

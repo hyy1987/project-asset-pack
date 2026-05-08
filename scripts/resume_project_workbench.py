@@ -7,14 +7,16 @@ from pathlib import Path
 from typing import Any
 
 from _common import (
+    add_agent_argument,
     generated_workbench_dir,
-    invoke_claude_skill,
+    invoke_agent_skill,
     list_material_files,
     load_workbench_state,
     pre_project_materials_dir,
     project_security_rule_set,
     repo_relative,
     reviewed_workbench_dir,
+    selected_agent,
     save_workbench_state,
     utc_now,
     workbench_state_path,
@@ -26,7 +28,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Resume an Agent-First workbench session.")
     parser.add_argument("--project", required=True, help="Project id, for example sample-project")
     parser.add_argument("--stage-id", default="", help="Optional stage id to focus on.")
-    parser.add_argument("--no-claude", action="store_true", help="Only generate resume brief; do not invoke Claude Code.")
+    add_agent_argument(parser)
     parser.add_argument("--overwrite", action="store_true", help="Compatibility flag; resume brief is always refreshed.")
     return parser.parse_args()
 
@@ -154,10 +156,12 @@ def main() -> int:
     print(f"Current stage: {stage_id or 'None'}")
     print(f"Next action: {values['next_action']}")
 
-    if args.no_claude:
+    agent = selected_agent(args)
+    if agent == "none":
         return 0
 
-    return invoke_claude_skill(
+    return invoke_agent_skill(
+        agent,
         ".claude/skills/resume-project-workbench/SKILL.md",
         [
             f"Project id: {args.project}",

@@ -5,7 +5,7 @@ import argparse
 import sys
 from pathlib import Path
 
-from _common import REPO_ROOT, invoke_claude_skill, load_project_config
+from _common import REPO_ROOT, add_agent_argument, invoke_agent_skill, load_project_config, selected_agent
 
 
 def parse_args() -> argparse.Namespace:
@@ -15,7 +15,8 @@ def parse_args() -> argparse.Namespace:
         "--comments",
         help="Optional manual review comments file. Defaults to docs/manual/review-comments/<project_id>.md",
     )
-    parser.add_argument("--dry-run", action="store_true", help="Print Claude context without invoking Claude Code.")
+    add_agent_argument(parser)
+    parser.add_argument("--dry-run", action="store_true", help="Print Agent context without invoking an Agent client.")
     return parser.parse_args()
 
 
@@ -47,7 +48,8 @@ def main() -> int:
         print("\n".join(context))
         return 0
 
-    return invoke_claude_skill(
+    return invoke_agent_skill(
+        selected_agent(args),
         ".claude/skills/review-asset-pack/SKILL.md",
         context,
         label=f"Review asset pack for {args.project}",

@@ -4,17 +4,18 @@ from __future__ import annotations
 import argparse
 import sys
 
-from _common import REPO_ROOT, get_project_repositories, invoke_claude_skill, load_project_config, run_git
+from _common import REPO_ROOT, add_agent_argument, get_project_repositories, invoke_agent_skill, load_project_config, run_git, selected_agent
 
 
 VALID_PERIODS = {"daily", "weekly", "milestone", "release", "handover"}
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Run a project health check through Claude Code.")
+    parser = argparse.ArgumentParser(description="Run a project health check through an Agent client.")
     parser.add_argument("--project", required=True, help="Project id, for example sample-project")
     parser.add_argument("--period", default="weekly", choices=sorted(VALID_PERIODS))
-    parser.add_argument("--dry-run", action="store_true", help="Print Claude context without invoking Claude Code.")
+    add_agent_argument(parser)
+    parser.add_argument("--dry-run", action="store_true", help="Print Agent context without invoking an Agent client.")
     return parser.parse_args()
 
 
@@ -57,7 +58,8 @@ def main() -> int:
         print("\n".join(context))
         return 0
 
-    return invoke_claude_skill(
+    return invoke_agent_skill(
+        selected_agent(args),
         ".claude/skills/check-project-health/SKILL.md",
         context,
         label=f"Check project health for {args.project}",

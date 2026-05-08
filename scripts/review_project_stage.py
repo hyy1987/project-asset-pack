@@ -5,11 +5,13 @@ import argparse
 import sys
 
 from _common import (
-    invoke_claude_skill,
+    add_agent_argument,
+    invoke_agent_skill,
     load_workbench_state,
     repo_relative,
     reviewed_workbench_dir,
     save_workbench_state,
+    selected_agent,
     stage_reviewed_dir,
     utc_now,
     write_rendered_template,
@@ -25,7 +27,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--stage-id", required=True, help="Stage id, for example stage-1")
     parser.add_argument("--decision", required=True, choices=sorted(VALID_DECISIONS))
     parser.add_argument("--title", default="", help="Stage title; defaults to title recorded in workbench state.")
-    parser.add_argument("--no-claude", action="store_true", help="Only create review record scaffold; do not invoke Claude Code.")
+    add_agent_argument(parser)
     parser.add_argument("--overwrite", action="store_true", help="Overwrite reviewed scaffold files.")
     return parser.parse_args()
 
@@ -67,10 +69,12 @@ def main() -> int:
     print(f"Created stage review record: {review_path}")
     print(f"Decision: {args.decision}")
 
-    if args.no_claude:
+    agent = selected_agent(args)
+    if agent == "none":
         return 0
 
-    return invoke_claude_skill(
+    return invoke_agent_skill(
+        agent,
         ".claude/skills/review-project-stage/SKILL.md",
         [
             f"Project id: {args.project}",

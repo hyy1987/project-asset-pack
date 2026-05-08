@@ -6,9 +6,10 @@ import sys
 from pathlib import Path
 
 from _common import (
+    add_agent_argument,
     generated_asset_pack_dir,
     generated_workbench_dir,
-    invoke_claude_skill,
+    invoke_agent_skill,
     list_material_files,
     load_project_config,
     load_workbench_state,
@@ -17,6 +18,7 @@ from _common import (
     repo_relative,
     reviewed_workbench_dir,
     save_workbench_state,
+    selected_agent,
     utc_now,
 )
 
@@ -24,7 +26,7 @@ from _common import (
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Finalize workbench process outputs into a standard asset pack draft.")
     parser.add_argument("--project", required=True, help="Project id, for example sample-project")
-    parser.add_argument("--no-claude", action="store_true", help="Only create archive scaffold files; do not invoke Claude Code.")
+    add_agent_argument(parser)
     parser.add_argument("--overwrite", action="store_true", help="Overwrite generated scaffold files.")
     return parser.parse_args()
 
@@ -135,10 +137,12 @@ def main() -> int:
     for path in created:
         print(f"- {path}")
 
-    if args.no_claude:
+    agent = selected_agent(args)
+    if agent == "none":
         return 0
 
-    return invoke_claude_skill(
+    return invoke_agent_skill(
+        agent,
         ".claude/skills/finalize-workbench-asset-pack/SKILL.md",
         [
             f"Project id: {args.project}",

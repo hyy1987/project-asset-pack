@@ -1,0 +1,34 @@
+# 生成阶段计划
+
+用于基于已确认上下文和全周期规划生成阶段计划。
+
+## 输入
+
+1. `docs/agent-workflows/workbench-overview.md`
+2. `configs/projects/<project_id>.yaml`
+3. `outputs/generated/workbench/<project_id>/info-alignment.md`
+4. `outputs/generated/workbench/<project_id>/project-kickoff-checklist.md`
+5. `outputs/generated/workbench/<project_id>/lifecycle-plan.md`
+6. `outputs/reviewed/workbench/<project_id>/human-confirmation.md`，如果存在
+7. `templates/workbench/stage-plan.md`
+
+## 输出
+
+写入：
+
+```text
+outputs/generated/workbench/<project_id>/stages/<stage_id>/stage-plan.md
+```
+
+更新 `workspace/workbench/<project_id>/state.json`。
+
+## 规则
+
+1. 阶段计划必须服从 `lifecycle-plan.md`。
+2. 说明本阶段在全周期规划中的位置。
+3. 阶段目标必须可评审。
+4. 阶段边界必须写清“做”和“不做”。
+5. 列出执行前需要人类确认的问题。
+6. 列出 Agent 执行步骤、自检与测试要求、阶段交付物。
+7. 默认不允许直接修改业务仓库，除非项目配置和人工确认明确允许。
+8. 如果全周期规划缺失或过期，先要求生成或修订全周期规划。

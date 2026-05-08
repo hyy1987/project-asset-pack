@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import argparse
 import json
 import shutil
 import subprocess
@@ -437,24 +438,78 @@ def get_claude_command() -> str:
     return claude
 
 
-def invoke_claude_skill(skill_file: str, context_lines: list[str], label: str) -> int:
-    skill_path = REPO_ROOT / skill_file
-    if not skill_path.is_file():
-        raise RuntimeError(f"Skill definition not found: {skill_path}")
+def get_codex_command() -> str:
+    codex = shutil.which("codex")
+    if codex is None:
+        raise RuntimeError("Codex CLI was not found in PATH. Install Codex CLI first.")
+    return codex
+
+
+def add_agent_argument(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument(
+        "--agent",
+        default="claude",
+        choices=("claude", "codex", "none"),
+        help="Agent backend to invoke. Use none to only create scaffold files.",
+    )
+    parser.add_argument(
+        "--no-agent",
+        action="store_true",
+        help="Compatibility shortcut for --agent none.",
+    )
+
+
+def selected_agent(args: argparse.Namespace) -> str:
+    if getattr(args, "no_agent", False):
+        return "none"
+    return getattr(args, "agent", "claude")
+
+
+def workflow_file_for_entrypoint(entrypoint_file: str) -> str:
+    parts = Path(entrypoint_file).parts
+    if len(parts) >= 4 and parts[0] == ".claude" and parts[1] == "skills" and parts[-1] == "SKILL.md":
+        candidate = f"docs/agent-workflows/{parts[2]}.md"
+        if (REPO_ROOT / candidate).is_file():
+            return candidate
+    return entrypoint_file
+
+
+def invoke_agent_skill(agent: str, skill_file: str, context_lines: list[str], label: str) -> int:
+    if agent == "none":
+        return 0
+    workflow_file = workflow_file_for_entrypoint(skill_file)
+    workflow_path = REPO_ROOT / workflow_file
+    if not workflow_path.is_file():
+        raise RuntimeError(f"Workflow definition not found: {workflow_path}")
 
     prompt = "\n".join(
         [
-            f"Read and follow `{skill_file}`.",
-            "Treat that skill file as the authoritative workflow for this run.",
+            f"Read and follow `{workflow_file}`.",
+            "`docs/agent-workflows/` is the authoritative workflow rule source.",
+            "Always read `docs/agent-workflows/workbench-overview.md` before executing project work.",
             "Do not rely on slash-command parsing for this invocation.",
             "",
             *context_lines,
         ]
     )
-    print(f"Running Claude Code: {label}")
-    result = subprocess.run(
-        [get_claude_command(), "-p", prompt, "--permission-mode", "acceptEdits"],
-        cwd=REPO_ROOT,
-        check=False,
-    )
+    if agent == "claude":
+        print(f"Running Claude Code: {label}")
+        result = subprocess.run(
+            [get_claude_command(), "-p", prompt, "--permission-mode", "acceptEdits"],
+            cwd=REPO_ROOT,
+            check=False,
+        )
+    elif agent == "codex":
+        print(f"Running Codex: {label}")
+        result = subprocess.run(
+            [get_codex_command(), "exec", prompt],
+            cwd=REPO_ROOT,
+            check=False,
+        )
+    else:
+        raise RuntimeError(f"Unsupported agent backend: {agent}")
     return result.returncode
+
+
+def invoke_claude_skill(skill_file: str, context_lines: list[str], label: str) -> int:
+    return invoke_agent_skill("claude", skill_file, context_lines, label)

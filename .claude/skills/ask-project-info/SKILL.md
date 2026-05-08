@@ -6,19 +6,15 @@ allowed-tools: Read, Write, Edit, MultiEdit, Glob, Grep, LS
 
 # ask-project-info
 
-用于在信息对齐、阶段计划或阶段执行中发现缺口后，生成面向人类的问题清单。
+这是 Claude Code 快捷入口。通用规则以 `docs/agent-workflows/` 为准。
 
-## 输出
+执行时先读取并遵守：
 
-写入：
+1. `docs/agent-workflows/workbench-overview.md`
+2. `docs/agent-workflows/ask-project-info.md`
+
+输出到：
 
 ```text
 outputs/generated/workbench/<project_id>/human-questions.md
 ```
-
-## 要求
-
-- 问题必须按责任视角归类。
-- 每个问题说明为什么需要确认。
-- 每个问题标注会影响的阶段或交付物。
-- 不问已经能从资料中确认的问题。

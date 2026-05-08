@@ -6,10 +6,12 @@ import sys
 from typing import Any
 
 from _common import (
+    add_agent_argument,
     collect_changes,
-    invoke_claude_skill,
+    invoke_agent_skill,
     load_baseline,
     save_baseline,
+    selected_agent,
     sync_project_repositories,
 )
 
@@ -22,7 +24,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--force",
         action="store_true",
-        help="Run Claude update even if no repository commits changed, and record a fresh baseline afterward.",
+        help="Run Agent update even if no repository commits changed, and record a fresh baseline afterward.",
     )
     parser.add_argument(
         "--no-fetch",
@@ -32,8 +34,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--check-only",
         action="store_true",
-        help="Fetch/sync and report changes without invoking Claude or updating the recorded baseline.",
+        help="Fetch/sync and report changes without invoking an Agent or updating the recorded baseline.",
     )
+    add_agent_argument(parser)
     return parser.parse_args()
 
 
@@ -137,7 +140,14 @@ def main() -> int:
         print("No new remote commits detected since the recorded asset pack baseline. Skipping update.")
         return 0
 
-    result = invoke_claude_skill(
+    agent = selected_agent(args)
+    if agent == "none":
+        print("Agent invocation skipped. Asset pack was not updated and baseline was not changed.")
+        print("\n".join(build_context(args.project, changes, args.force, previous_state)))
+        return 0
+
+    result = invoke_agent_skill(
+        agent,
         ".claude/skills/update-asset-pack/SKILL.md",
         build_context(args.project, changes, args.force, previous_state),
         label=f"Update asset pack for {args.project}",

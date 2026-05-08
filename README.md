@@ -1,6 +1,6 @@
 # Project Asset Pack
 
-基于 Claude Code 的项目资产包生成、评审、增量更新和 Agent-First 软件外包项目工作台。
+支持 Claude Code 和 Codex 的项目资产包生成、评审、增量更新和 Agent-First 软件外包项目工作台。
 
 当前项目已经从“历史项目资产包生成工具”扩展为一个文件化工作台 MVP，用来支持外包项目从前期资料接入、信息对齐、全周期规划、阶段计划、阶段执行、阶段评审，到结题归档为标准项目资产包初稿的闭环。
 
@@ -31,20 +31,22 @@
    - 人工评审阶段结果。
    - 评审通过后进入下一阶段。
    - 项目结题或阶段性归档时，把工作台过程资料归档为标准项目资产包初稿。
-   - 新 Claude Code 窗口可通过恢复摘要继续工作，避免重复初始化。
+   - 新 Agent 窗口可通过恢复摘要继续工作，避免重复初始化。
 
 ## 目录结构
 
 ```text
 project-asset-pack/
-|-- .claude/      Claude Code 配置和 skills
+|-- .claude/      Claude Code 配置和 skills 入口
 |-- configs/      项目接入配置和安全规则
-|-- docs/         使用手册、人工补充和评审意见
+|-- docs/         通用 Agent 工作流、使用手册、人工补充和评审意见
 |-- examples/     可提交的示例项目材料
 |-- inputs/       真实项目前期资料输入区，默认不提交
 |-- outputs/      AI 初稿、人工评审结果和发布产物，默认不提交
 |-- scripts/      自动化脚本
 |-- templates/    资产包和工作台输出模板
+|-- AGENTS.md     Codex 入口说明
+|-- CLAUDE.md     Claude Code 入口说明
 `-- workspace/    状态、日志和快照，默认不提交
 ```
 
@@ -58,7 +60,7 @@ examples/sample-project/pre-project/
 
 `configs/projects/sample-project.yaml` 已经指向这个目录。
 
-先复制 Claude Code 本地配置示例：
+如果使用 Claude Code，先复制本地配置示例：
 
 ```powershell
 Copy-Item .claude/settings.local.example.json .claude/settings.local.json
@@ -74,21 +76,34 @@ python scripts/check_project_config.py --project sample-project
 
 ## 推荐使用方式
 
-`project-asset-pack` 的主要使用场景是在 Claude Code 中由 Agent 读取规则、执行工作流和生成文件。
+`project-asset-pack` 的主要使用场景是在 Claude Code 或 Codex 中由 Agent 读取规则、执行工作流和生成文件。
+
+通用规则统一放在：
+
+```text
+docs/agent-workflows/
+```
+
+其中：
+
+- `CLAUDE.md` 是 Claude Code 入口说明。
+- `.claude/skills/` 是 Claude Code 快捷命令入口。
+- `AGENTS.md` 是 Codex 入口说明。
+- `docs/agent-workflows/` 是唯一工作流规则源。
 
 推荐顺序是：
 
 1. **自然语言启动**：最适合日常使用，也最符合 Agent-First 工作方式。
-2. **快捷命令启动**：适合熟悉项目后快速触发固定 skill。
-3. **Python 脚本启动**：适合离线验证、自动化、CI 或 Claude Code 不可用时检查目录和状态。
+2. **快捷命令启动**：适合在 Claude Code 中快速触发固定 skill。
+3. **Python 脚本启动**：适合离线验证、自动化、CI 或 Agent 客户端不可用时检查目录和状态。
 
-例如启动一个新项目工作台，可以直接在 Claude Code 里说：
+例如启动一个新项目工作台，可以直接在 Claude Code 或 Codex 里说：
 
 ```text
 请基于 my-project 的配置和前期资料，启动 Agent-First 项目工作台，完成信息对齐稿、项目启动清单、责任视角问题清单、资产包骨架和风险行动清单。
 ```
 
-也可以用快捷命令：
+如果使用 Claude Code，也可以用快捷命令：
 
 ```text
 /init-project-workbench my-project
@@ -100,19 +115,35 @@ python scripts/check_project_config.py --project sample-project
 python scripts/init_project_workbench.py --project my-project
 ```
 
-### 离线验证
+Codex 中也可以明确引用通用 workflow：
 
-不调用 Claude Code，只验证目录、模板和状态推进：
+```text
+按 docs/agent-workflows/init-project-workbench.md，启动 my-project 工作台。
+```
+
+脚本支持通过 `--agent` 选择 Agent 后端：
 
 ```powershell
-python scripts/init_project_workbench.py --project sample-project --no-claude --overwrite
+python scripts/init_project_workbench.py --project my-project --agent claude
+python scripts/init_project_workbench.py --project my-project --agent codex
+python scripts/init_project_workbench.py --project my-project --agent none
+```
+
+默认是 `--agent claude`。`--agent none` 用于只生成目录、模板和状态，不拉起任何 Agent 客户端；`--no-agent` 作为兼容写法，等价于 `--agent none`。
+
+### 离线验证
+
+不调用 Agent 客户端，只验证目录、模板和状态推进：
+
+```powershell
+python scripts/init_project_workbench.py --project sample-project --agent none --overwrite
 python scripts/confirm_project_context.py --project sample-project --decision confirmed --overwrite
-python scripts/plan_project_lifecycle.py --project sample-project --no-claude --overwrite
-python scripts/plan_project_stage.py --project sample-project --stage-id stage-1 --title "第一阶段" --no-claude --overwrite
-python scripts/run_project_stage.py --project sample-project --stage-id stage-1 --no-claude --overwrite
-python scripts/review_project_stage.py --project sample-project --stage-id stage-1 --decision approve --no-claude --overwrite
-python scripts/resume_project_workbench.py --project sample-project --no-claude --overwrite
-python scripts/finalize_workbench_asset_pack.py --project sample-project --no-claude --overwrite
+python scripts/plan_project_lifecycle.py --project sample-project --agent none --overwrite
+python scripts/plan_project_stage.py --project sample-project --stage-id stage-1 --title "第一阶段" --agent none --overwrite
+python scripts/run_project_stage.py --project sample-project --stage-id stage-1 --agent none --overwrite
+python scripts/review_project_stage.py --project sample-project --stage-id stage-1 --decision approve --agent none --overwrite
+python scripts/resume_project_workbench.py --project sample-project --agent none --overwrite
+python scripts/finalize_workbench_asset_pack.py --project sample-project --agent none --overwrite
 python scripts/check_project_workbench.py --project sample-project
 ```
 
@@ -134,18 +165,32 @@ claude
 如果 slash command 没有识别，可以直接输入：
 
 ```text
-请按 .claude/skills/init-project-workbench/SKILL.md 的规则，基于 configs/projects/sample-project.yaml 和 examples/sample-project/pre-project 生成 sample-project 的工作台初始化输出。
+请按 docs/agent-workflows/init-project-workbench.md 的规则，基于 configs/projects/sample-project.yaml 和 examples/sample-project/pre-project 生成 sample-project 的工作台初始化输出。
+```
+
+### 使用 Codex 验证
+
+从本目录启动 Codex 后，直接用自然语言引用通用 workflow：
+
+```text
+按 docs/agent-workflows/init-project-workbench.md，基于 configs/projects/sample-project.yaml 和 examples/sample-project/pre-project 生成 sample-project 的工作台初始化输出。
+```
+
+继续阶段工作时同样引用对应 workflow：
+
+```text
+按 docs/agent-workflows/resume-project-workbench.md，恢复 sample-project 的工作台上下文。
 ```
 
 ## 新窗口恢复
 
-Claude Code 的聊天历史不是工作台进度来源。工作台进度记录在：
+Agent 客户端的聊天历史不是工作台进度来源。工作台进度记录在：
 
 ```text
 workspace/workbench/<project_id>/state.json
 ```
 
-如果 Claude Code 新窗口不知道当前进度，先运行：
+如果新窗口不知道当前进度，先运行：
 
 ```text
 /resume-project-workbench my-project
@@ -169,7 +214,7 @@ python scripts/resume_project_workbench.py --project my-project
 outputs/generated/workbench/my-project/resume-brief.md
 ```
 
-新窗口中的 Claude Code 应先读取这份恢复摘要，再继续阶段执行、阶段评审、全周期规划修订、下一阶段规划或归档。只有状态文件不存在，或人类明确要求重建，才重新初始化。
+新窗口中的 Agent 应先读取这份恢复摘要，再继续阶段执行、阶段评审、全周期规划修订、下一阶段规划或归档。只有状态文件不存在，或人类明确要求重建，才重新初始化。
 
 ## Agent-First 工作台流程
 
@@ -463,7 +508,28 @@ python scripts/review_asset_pack.py --project my-project
 python scripts/check_project_health.py --project my-project --period weekly
 ```
 
-## Claude Code Skills
+## Agent 入口和工作流规则
+
+通用工作流规则：
+
+```text
+docs/agent-workflows/
+```
+
+Claude Code 入口：
+
+```text
+CLAUDE.md
+.claude/skills/
+```
+
+Codex 入口：
+
+```text
+AGENTS.md
+```
+
+Claude Code 快捷命令：
 
 资产包相关：
 
