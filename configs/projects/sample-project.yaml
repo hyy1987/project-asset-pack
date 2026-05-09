@@ -1,19 +1,9 @@
 project_id: sample-project
 project_name: 示例项目
-project_type: new
-status: sample
 
 workbench:
-  mode: agent-first
   pre_project_materials: inputs/pre-project
   allow_code_changes: true
-  default_stage_id: stage-1
-  default_stage_title: 第一阶段
-
-owners:
-  project_manager: 待补充
-  tech_lead: 待补充
-  test_lead: 待补充
 
 git:
   remote_base_url: git@github.com:your-org
