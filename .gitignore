@@ -2,6 +2,10 @@
 __pycache__/
 *.pyc
 scripts/__pycache__/
+configs/projects/*
+configs/security-rules/*
+!configs/projects/sample-project.yaml
+!configs/security-rules/default-outsourcing-project.md
 workspace/input/
 workspace/sanitized/
 workspace/logs/*
