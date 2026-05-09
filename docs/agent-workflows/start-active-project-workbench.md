@@ -1,4 +1,4 @@
-# 接入在研项目工作台
+﻿# 接入在研项目工作台
 
 用于把正在进行中的项目直接接入 Agent-First 工作台。项目可以已经有资产包，也可以只有项目配置、业务仓库和资料目录。
 
@@ -28,12 +28,12 @@
 
 写入 `outputs/generated/workbench/`：
 
-- `active-project-intake.md`
-- `info-alignment.md`
-- `project-kickoff-checklist.md`
-- `responsibility-questions.md`
-- `asset-pack-skeleton.md`
-- `risk-action-list.md`
+- `01-active-project-intake.md`
+- `02-info-alignment.md`
+- `03-project-kickoff-checklist.md`
+- `04-responsibility-questions.md`
+- `05-asset-pack-skeleton.md`
+- `06-risk-action-list.md`
 
 必要时写入或更新：
 
@@ -51,3 +51,4 @@ workspace/workbench/state.json
 5. 进入开发前必须生成或修订全周期规划，再生成下一阶段计划。
 6. 如果已有工作台状态，不得删除已有阶段记录和人工评审结果，只能追加接入来源和新的工作台输出。
 7. 修改业务项目仓库仍必须同时满足：项目配置允许、阶段计划允许、人类明确授权。
+

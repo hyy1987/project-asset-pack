@@ -1,4 +1,4 @@
-# Agent 工作台通用规则
+﻿# Agent 工作台通用规则
 
 本目录是 `project-asset-pack` 的 Agent 无关工作流规则源。
 
@@ -67,11 +67,11 @@ Claude Code、Codex 或其他 Agent 客户端都应读取这里的规则。`.cla
 
 1. `configs/projects/<project_id>.yaml`
 2. `workspace/workbench/state.json`，如果存在
-3. `outputs/generated/workbench/resume-brief.md`，如果存在
+3. `outputs/generated/workbench/00-resume-brief.md`，如果存在
 4. `configs/security-rules/<rule_set>.md`
 5. `inputs/pre-project/` 或配置中声明的前期资料目录
 6. `outputs/reviewed/workbench/` 中已经人工确认的信息
-7. `outputs/generated/workbench/lifecycle-plan.md`，如果存在
+7. `outputs/generated/workbench/07-lifecycle-plan.md`，如果存在
 8. `workspace/workbench/project-experience.md`，如果存在
 9. `outputs/generated/workbench/` 中的 AI 初稿和阶段输出
 10. `outputs/reviewed/asset-pack/` 中已有的正式资产包，如果存在
@@ -87,7 +87,7 @@ Claude Code、Codex 或其他 Agent 客户端都应读取这里的规则。`.cla
 - 人工评审结果：`outputs/reviewed/`
 - 工作台状态：`workspace/workbench/state.json`
 - 项目经验库：`workspace/workbench/project-experience.md`
-- 新窗口恢复摘要：`outputs/generated/workbench/resume-brief.md`
+- 新窗口恢复摘要：`outputs/generated/workbench/00-resume-brief.md`
 - 新资料接入：`outputs/generated/workbench/material-intake/`
 - 需求变更队列：`outputs/generated/workbench/change-requests/`
 
@@ -103,3 +103,4 @@ AI 输出只能作为初稿。正式材料必须经过人工评审后进入 `out
 - 默认不修改业务项目仓库。
 - 修改业务项目必须同时满足：项目配置允许、阶段计划允许、人类明确授权。
 - 不绕过人工评审进入下一阶段。
+

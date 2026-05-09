@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 from __future__ import annotations
 
 import argparse
@@ -34,7 +34,7 @@ def main() -> int:
         "project_id": args.project,
         "generated_at": utc_now(),
     }
-    lifecycle_path = write_rendered_template("lifecycle-plan.md", out_dir / "lifecycle-plan.md", values, overwrite=args.overwrite)
+    lifecycle_path = write_rendered_template("lifecycle-plan.md", out_dir / "07-lifecycle-plan.md", values, overwrite=args.overwrite)
 
     state = load_workbench_state(args.project)
     previous_status = state.get("status", "new")
@@ -89,3 +89,4 @@ if __name__ == "__main__":
     except Exception as exc:
         print(str(exc), file=sys.stderr)
         raise SystemExit(1)
+

@@ -1,4 +1,4 @@
-# 启动项目工作台
+﻿# 启动项目工作台
 
 用于接入新外包任务前期资料，生成信息对齐稿、项目启动清单、责任视角问题清单、资产包骨架和风险行动清单。
 
@@ -18,11 +18,11 @@
 
 写入 `outputs/generated/workbench/`：
 
-- `info-alignment.md`
-- `project-kickoff-checklist.md`
-- `responsibility-questions.md`
-- `asset-pack-skeleton.md`
-- `risk-action-list.md`
+- `02-info-alignment.md`
+- `03-project-kickoff-checklist.md`
+- `04-responsibility-questions.md`
+- `05-asset-pack-skeleton.md`
+- `06-risk-action-list.md`
 
 更新 `workspace/workbench/state.json`。
 
@@ -33,3 +33,4 @@
 3. 无法确认的内容标注“待人工确认”。
 4. 初始化只做信息对齐和启动资料整理，不生成全周期规划。
 5. 生成后提醒人类确认上下文，再进入全周期规划。
+

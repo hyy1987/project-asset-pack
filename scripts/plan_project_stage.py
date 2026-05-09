@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 from __future__ import annotations
 
 import argparse
@@ -32,7 +32,7 @@ def main() -> int:
     args = parse_args()
     out_dir = stage_generated_dir(args.project, args.stage_id)
     state = load_workbench_state(args.project)
-    lifecycle_plan = state.get("lifecycle_plan") or repo_relative(out_dir.parent.parent / "lifecycle-plan.md")
+    lifecycle_plan = state.get("lifecycle_plan") or repo_relative(out_dir.parent.parent / "07-lifecycle-plan.md")
     values = {
         "project_id": args.project,
         "stage_id": args.stage_id,
@@ -88,3 +88,4 @@ if __name__ == "__main__":
     except Exception as exc:
         print(str(exc), file=sys.stderr)
         raise SystemExit(1)
+

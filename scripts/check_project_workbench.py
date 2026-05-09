@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 from __future__ import annotations
 
 import argparse
@@ -37,16 +37,32 @@ def main() -> int:
     print(f"State file: {state_path}")
     print(f"Config allows code changes: {workbench_allows_code_changes(args.project)}")
 
-    missing = []
-    for path in [
-        generated_dir / "info-alignment.md",
-        generated_dir / "project-kickoff-checklist.md",
-        generated_dir / "responsibility-questions.md",
-        generated_dir / "asset-pack-skeleton.md",
-        generated_dir / "risk-action-list.md",
-        generated_dir / "lifecycle-plan.md",
+    state = load_workbench_state(args.project)
+    status = state.get("status", "new")
+    required = [
+        generated_dir / "02-info-alignment.md",
+        generated_dir / "03-project-kickoff-checklist.md",
+        generated_dir / "04-responsibility-questions.md",
+        generated_dir / "05-asset-pack-skeleton.md",
+        generated_dir / "06-risk-action-list.md",
         state_path,
-    ]:
+    ]
+    if state.get("active_project_intake"):
+        required.insert(0, generated_dir / "01-active-project-intake.md")
+    if state.get("lifecycle_plan") or status in {
+        "lifecycle-planned",
+        "stage-planned",
+        "stage-running",
+        "stage-quality-checking",
+        "stage-review-required",
+        "stage-approved",
+        "stage-experience-summarized",
+        "asset-pack-draft-generated",
+    }:
+        required.append(generated_dir / "07-lifecycle-plan.md")
+
+    missing = []
+    for path in required:
         if not path.exists():
             missing.append(path)
 
@@ -56,7 +72,6 @@ def main() -> int:
             print(f"- {path}")
         return 1
 
-    state = load_workbench_state(args.project)
     print(f"Workbench status: {state.get('status')}")
     print(f"Current stage: {state.get('current_stage_id')}")
     print("Workbench check passed.")
@@ -69,3 +84,4 @@ if __name__ == "__main__":
     except Exception as exc:
         print(str(exc), file=sys.stderr)
         raise SystemExit(1)
+

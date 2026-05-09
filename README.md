@@ -1,4 +1,4 @@
-# Project Asset Pack
+﻿# Project Asset Pack
 
 支持 Claude Code 和 Codex 的项目资产包生成、评审、在研项目辅助检查和 Agent-First 软件外包项目工作台。
 
@@ -274,7 +274,7 @@ python scripts/resume_project_workbench.py --project my-project
 它会生成：
 
 ```text
-../my-project/my-project-docs/outputs/generated/workbench/resume-brief.md
+../my-project/my-project-docs/outputs/generated/workbench/00-resume-brief.md
 ```
 
 新窗口中的 Agent 应先读取这份恢复摘要，再继续阶段执行、阶段评审、全周期规划修订、下一阶段规划或归档。只有状态文件不存在，或人类明确要求重建，才重新初始化。
@@ -311,14 +311,14 @@ python scripts/start_active_project_workbench.py --project my-project
 接入输出包括：
 
 ```text
-../my-project/my-project-docs/outputs/generated/workbench/active-project-intake.md
-../my-project/my-project-docs/outputs/generated/workbench/info-alignment.md
-../my-project/my-project-docs/outputs/generated/workbench/risk-action-list.md
+../my-project/my-project-docs/outputs/generated/workbench/01-active-project-intake.md
+../my-project/my-project-docs/outputs/generated/workbench/02-info-alignment.md
+../my-project/my-project-docs/outputs/generated/workbench/06-risk-action-list.md
 ../my-project/my-project-docs/workspace/workbench/state.json
 ../my-project/my-project-docs/workspace/workbench/project-experience.md
 ```
 
-接入后不要直接执行阶段开发。先人工确认 `active-project-intake.md`、`info-alignment.md` 和 `risk-action-list.md`，再生成或修订全周期规划：
+接入后不要直接执行阶段开发。先人工确认 `01-active-project-intake.md`、`02-info-alignment.md` 和 `06-risk-action-list.md`，再生成或修订全周期规划：
 
 ```powershell
 python scripts/plan_project_lifecycle.py --project my-project --revision-reason "在研项目接入工作台，规划后续开发"
@@ -820,14 +820,14 @@ Claude Code 快捷命令：
 
 ```text
 ../my-project/my-project-docs/outputs/generated/workbench/
-|-- active-project-intake.md
-|-- info-alignment.md
-|-- project-kickoff-checklist.md
-|-- responsibility-questions.md
-|-- asset-pack-skeleton.md
-|-- risk-action-list.md
-|-- lifecycle-plan.md
-`-- resume-brief.md
+|-- 00-resume-brief.md
+|-- 01-active-project-intake.md
+|-- 02-info-alignment.md
+|-- 03-project-kickoff-checklist.md
+|-- 04-responsibility-questions.md
+|-- 05-asset-pack-skeleton.md
+|-- 06-risk-action-list.md
+`-- 07-lifecycle-plan.md
 ```
 
 阶段输出到：
@@ -920,3 +920,4 @@ project-asset-pack-project-b/
 - 默认不修改业务项目仓库。
 - 不越过人工确认改变交付范围。
 - 不绕过阶段评审进入下一阶段。
+

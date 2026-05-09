@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 from __future__ import annotations
 
 import argparse
@@ -204,7 +204,7 @@ def main() -> int:
 
     resume_path = write_rendered_template(
         "resume-brief.md",
-        generated_dir / "resume-brief.md",
+        generated_dir / "00-resume-brief.md",
         values,
         overwrite=True,
     )
@@ -249,3 +249,4 @@ if __name__ == "__main__":
     except Exception as exc:
         print(str(exc), file=sys.stderr)
         raise SystemExit(1)
+

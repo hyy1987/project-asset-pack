@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 from __future__ import annotations
 
 import argparse
@@ -42,11 +42,11 @@ def main() -> int:
     }
 
     created = [
-        write_rendered_template("info-alignment.md", out_dir / "info-alignment.md", values, overwrite=args.overwrite),
-        write_rendered_template("project-kickoff-checklist.md", out_dir / "project-kickoff-checklist.md", values, overwrite=args.overwrite),
-        write_rendered_template("responsibility-questions.md", out_dir / "responsibility-questions.md", values, overwrite=args.overwrite),
-        write_rendered_template("asset-pack-skeleton.md", out_dir / "asset-pack-skeleton.md", values, overwrite=args.overwrite),
-        write_rendered_template("risk-action-list.md", out_dir / "risk-action-list.md", values, overwrite=args.overwrite),
+        write_rendered_template("info-alignment.md", out_dir / "02-info-alignment.md", values, overwrite=args.overwrite),
+        write_rendered_template("project-kickoff-checklist.md", out_dir / "03-project-kickoff-checklist.md", values, overwrite=args.overwrite),
+        write_rendered_template("responsibility-questions.md", out_dir / "04-responsibility-questions.md", values, overwrite=args.overwrite),
+        write_rendered_template("asset-pack-skeleton.md", out_dir / "05-asset-pack-skeleton.md", values, overwrite=args.overwrite),
+        write_rendered_template("risk-action-list.md", out_dir / "06-risk-action-list.md", values, overwrite=args.overwrite),
     ]
 
     state = load_workbench_state(args.project)
@@ -88,3 +88,4 @@ if __name__ == "__main__":
     except Exception as exc:
         print(str(exc), file=sys.stderr)
         raise SystemExit(1)
+

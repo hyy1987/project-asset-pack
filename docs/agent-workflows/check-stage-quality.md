@@ -1,4 +1,4 @@
-# 检查阶段质量门禁
+﻿# 检查阶段质量门禁
 
 用于在阶段执行完成后、人工评审前，检查阶段结果是否具备进入人工评审的最低质量。
 
@@ -7,7 +7,7 @@
 1. `docs/agent-workflows/workbench-overview.md`
 2. `configs/projects/<project_id>.yaml`
 3. `workspace/workbench/project-experience.md`，如果存在
-4. `outputs/generated/workbench/lifecycle-plan.md`
+4. `outputs/generated/workbench/07-lifecycle-plan.md`
 5. `outputs/generated/workbench/stages/<stage_id>/stage-plan.md`
 6. `outputs/generated/workbench/stages/<stage_id>/stage-report.md`
 7. `outputs/generated/workbench/stages/<stage_id>/asset-pack-update.md`
@@ -38,3 +38,4 @@ outputs/generated/workbench/stages/<stage_id>/quality-command-results.md
 9. 门禁结论只能是：`pass`、`warning` 或 `block`。
 10. `block` 时不得建议进入人工通过评审，只能建议返工或补充验证。
 11. 如果配置了 `quality.commands`、`quality.runtime` 或 `quality.smoke`，必须读取命令执行结果；命令、启动检查或冒烟检查失败时门禁不得为 `pass`。
+

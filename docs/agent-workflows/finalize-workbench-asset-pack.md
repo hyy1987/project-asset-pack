@@ -1,4 +1,4 @@
-# 工作台归档为资产包初稿
+﻿# 工作台归档为资产包初稿
 
 用于项目结题或阶段性归档时，把工作台过程资料汇总成标准项目资产包初稿。
 
@@ -8,7 +8,7 @@
 2. 项目配置：`configs/projects/<project_id>.yaml`
 3. 安全规则：`configs/security-rules/<rule_set>.md`
 4. 工作台 AI 输出：`outputs/generated/workbench/`
-5. 全周期规划：`outputs/generated/workbench/lifecycle-plan.md`
+5. 全周期规划：`outputs/generated/workbench/07-lifecycle-plan.md`
 6. 工作台人工确认和阶段评审：`outputs/reviewed/workbench/`
 7. 工作台状态：`workspace/workbench/state.json`
 8. 标准资产包模板
@@ -35,3 +35,4 @@
 7. 不得输出敏感原文。
 8. 不得编造未在工作台过程资料中出现的内容。
 9. 归档结果仍是 AI 初稿，必须经过人工资产包评审后才能定稿。
+

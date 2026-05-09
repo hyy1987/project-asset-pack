@@ -1,4 +1,4 @@
-# 执行阶段开发
+﻿# 执行阶段开发
 
 用于让一个 Agent 按阶段计划推进开发、自检、测试、资产包更新，并生成阶段报告。
 
@@ -7,7 +7,7 @@
 1. `docs/agent-workflows/workbench-overview.md`
 2. 项目配置和安全规则
 3. 已确认的项目信息或人工确认记录
-4. `outputs/generated/workbench/lifecycle-plan.md`
+4. `outputs/generated/workbench/07-lifecycle-plan.md`
 5. `outputs/generated/workbench/stages/<stage_id>/stage-plan.md`
 6. `outputs/generated/workbench/material-intake/index.md`，如果存在
 7. `outputs/generated/workbench/change-requests/index.md`，如果存在
@@ -43,3 +43,4 @@ outputs/generated/workbench/stages/<stage_id>/quality-gate.md
 11. 不得绕过质量门禁和人工评审进入下一阶段。
 12. 不建议多个 Agent 终端同时推进同一阶段开发；多人主要在计划确认和阶段评审时进入。
 13. 不得实现未纳入阶段计划的 CR；如执行中出现新需求，先记录 CR，再等待人工确认是否调整阶段计划。
+

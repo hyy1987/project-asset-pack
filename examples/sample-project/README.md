@@ -1,4 +1,4 @@
-# sample-project 测试材料
+﻿# sample-project 测试材料
 
 这是一个用于验证 Agent-First 工作台流程的示例项目材料。
 
@@ -105,11 +105,11 @@ codex
 
 重点检查：
 
-- `info-alignment.md`
-- `project-kickoff-checklist.md`
-- `responsibility-questions.md`
-- `asset-pack-skeleton.md`
-- `risk-action-list.md`
+- `02-info-alignment.md`
+- `03-project-kickoff-checklist.md`
+- `04-responsibility-questions.md`
+- `05-asset-pack-skeleton.md`
+- `06-risk-action-list.md`
 
 8. 人工确认项目信息：
 
@@ -163,3 +163,4 @@ python scripts/summarize_stage_experience.py --project sample-project --stage-id
 python scripts/finalize_workbench_asset_pack.py --project sample-project --agent none --overwrite
 python scripts/check_project_workbench.py --project sample-project
 ```
+

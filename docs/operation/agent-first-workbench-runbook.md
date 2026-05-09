@@ -1,4 +1,4 @@
-# Agent-First 工作台运行手册
+﻿# Agent-First 工作台运行手册
 
 本手册描述 `project-asset-pack` 升级后的最小闭环。
 
@@ -9,8 +9,8 @@
 - AI 工作台输出：`outputs/generated/workbench/`
 - 人工评审输出：`outputs/reviewed/workbench/`
 - 工作台状态：`workspace/workbench/state.json`
-- 全周期规划：`outputs/generated/workbench/lifecycle-plan.md`
-- 新窗口恢复摘要：`outputs/generated/workbench/resume-brief.md`
+- 全周期规划：`outputs/generated/workbench/07-lifecycle-plan.md`
+- 新窗口恢复摘要：`outputs/generated/workbench/00-resume-brief.md`
 
 ## 新窗口恢复
 
@@ -32,16 +32,16 @@ python scripts/resume_project_workbench.py --project <project_id>
 并生成：
 
 ```text
-outputs/generated/workbench/resume-brief.md
+outputs/generated/workbench/00-resume-brief.md
 ```
 
-新窗口中的 Agent 应先阅读 `resume-brief.md`，再决定继续阶段执行、进入阶段评审、修订全周期规划、规划下一阶段，还是进行阶段性归档。只有状态文件不存在，或人类明确要求重建，才重新初始化工作台。
+新窗口中的 Agent 应先阅读 `00-resume-brief.md`，再决定继续阶段执行、进入阶段评审、修订全周期规划、规划下一阶段，还是进行阶段性归档。只有状态文件不存在，或人类明确要求重建，才重新初始化工作台。
 
 ## 最小流程
 
 1. 放入前期资料。
 2. 运行 `python scripts/init_project_workbench.py --project <project_id>`。
-3. 人工确认 `info-alignment.md` 和 `project-kickoff-checklist.md`。
+3. 人工确认 `02-info-alignment.md` 和 `03-project-kickoff-checklist.md`。
 4. 运行 `python scripts/confirm_project_context.py --project <project_id> --decision confirmed`。
 5. 运行 `python scripts/plan_project_lifecycle.py --project <project_id>`，生成项目全周期规划。
 6. 运行 `python scripts/plan_project_stage.py --project <project_id> --stage-id stage-1 --title "第一阶段"`。
@@ -73,9 +73,9 @@ python scripts/start_active_project_workbench.py --project <project_id>
 
 并生成：
 
-- `outputs/generated/workbench/active-project-intake.md`
-- `outputs/generated/workbench/info-alignment.md`
-- `outputs/generated/workbench/risk-action-list.md`
+- `outputs/generated/workbench/01-active-project-intake.md`
+- `outputs/generated/workbench/02-info-alignment.md`
+- `outputs/generated/workbench/06-risk-action-list.md`
 - `workspace/workbench/project-experience.md`
 - `workspace/workbench/state.json`
 
@@ -155,3 +155,4 @@ python scripts/check_project_workbench.py --project sample-project
 ```
 
 如果要离线演示 `approve`，必须先人工补齐阶段报告、阶段资产包更新和质量门禁，并确保质量门禁明确允许进入人工评审；只有确有人工例外时才使用 `--skip-quality-gate`。
+
