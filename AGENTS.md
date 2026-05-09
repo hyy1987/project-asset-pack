@@ -53,6 +53,7 @@ Codex 没有 Claude Code 的 slash command 时，使用自然语言引用 workfl
 - 不维护 Codex 专属的另一套流程规则。
 - 默认不修改业务项目仓库。
 - 修改业务项目必须同时满足：项目配置允许、阶段计划允许、人类明确授权。
+- 用户或资料中途提出新增需求、需求变更、范围变化或验收标准变化时，先按 `docs/agent-workflows/record-change-request.md` 记录 CR，再评估是否修订规划或阶段计划。
 - AI 输出进入 `outputs/generated/`，正式结果必须经过人工评审后进入 `outputs/reviewed/`。
 - 不读取生产数据库备份。
 - 不输出账号、密码、Token、密钥、证书、生产连接串、客户真实业务数据、合同金额、报价和商业策略。

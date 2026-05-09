@@ -1,4 +1,4 @@
-﻿# Project Asset Pack
+# Project Asset Pack
 
 支持 Claude Code 和 Codex 的项目资产包生成、评审、在研项目辅助检查和 Agent-First 软件外包项目工作台。
 
@@ -331,6 +331,7 @@ python scripts/plan_project_stage.py --project my-project --stage-id stage-next 
 
 开发过程中，甲方可能随时发送新需求文档、会议纪要、补充说明或直接在聊天里提出新需求。这些内容可以在聊天窗口中触发处理，但必须落到工作台文件中，不能只停留在聊天记录里。
 
+工作台现在把需求变化作为阶段流程的主动触发器：阶段执行、阶段评审或恢复上下文时，只要出现新增需求、需求变更、范围变化或验收标准变化，Agent 应先生成 CR，再等待人工确认是否进入当前阶段或后续规划。
 ### 1. 接入新资料
 
 建议把甲方新发资料放到：
@@ -920,4 +921,3 @@ project-asset-pack-project-b/
 - 默认不修改业务项目仓库。
 - 不越过人工确认改变交付范围。
 - 不绕过阶段评审进入下一阶段。
-

@@ -121,6 +121,8 @@ def main() -> int:
             f"Human review decision: {args.decision}",
             f"Stage review output: {repo_relative(review_path)}",
             f"Stage experience output: {repo_relative(experience_path)}",
+            "If the human review introduces new requirements, scope changes, or acceptance-criteria changes, record them as CRs instead of treating them as normal stage fixes.",
+            "Stage approval covers the planned stage scope only; newly raised CRs still need triage and planning.",
         ],
         label=f"Review stage {args.stage_id} for {args.project}",
     )

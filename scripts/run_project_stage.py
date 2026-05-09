@@ -98,6 +98,8 @@ def main() -> int:
             f"Asset pack update output: {repo_relative(asset_update_path)}",
             f"Quality gate output: {repo_relative(quality_gate_path)}",
             "Do not implement new change requests unless they are explicitly included in the approved stage plan.",
+            "If new requirements, requirement changes, scope changes, or acceptance-criteria changes appear during this run, pause that work and record a CR before implementation.",
+            "A CR can be implemented in this stage only after human confirmation, an accepted-current-stage status, and updated stage plan plus quality gate checks.",
         ],
         label=f"Run stage {args.stage_id} for {args.project}",
     )

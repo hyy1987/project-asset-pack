@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 from __future__ import annotations
 
 import argparse
@@ -77,6 +77,7 @@ def main() -> int:
             f"Stage plan output: {repo_relative(plan_path)}",
             "Stage plan must follow the lifecycle plan. If the lifecycle plan is missing or outdated, ask to create or revise it first.",
             "Only include change requests in this stage when their status and target stage are human-confirmed.",
+            "List accepted CR ids included in this stage; list pending CRs separately as waiting for triage, clarification, or future planning.",
         ],
         label=f"Plan stage {args.stage_id} for {args.project}",
     )
@@ -88,4 +89,3 @@ if __name__ == "__main__":
     except Exception as exc:
         print(str(exc), file=sys.stderr)
         raise SystemExit(1)
-
