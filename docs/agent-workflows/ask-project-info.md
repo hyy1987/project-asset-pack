@@ -14,7 +14,7 @@
 写入：
 
 ```text
-outputs/generated/workbench/<project_id>/human-questions.md
+outputs/generated/workbench/human-questions.md
 ```
 
 ## 规则

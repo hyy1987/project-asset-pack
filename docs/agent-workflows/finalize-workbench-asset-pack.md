@@ -7,15 +7,15 @@
 1. `docs/agent-workflows/workbench-overview.md`
 2. 项目配置：`configs/projects/<project_id>.yaml`
 3. 安全规则：`configs/security-rules/<rule_set>.md`
-4. 工作台 AI 输出：`outputs/generated/workbench/<project_id>/`
-5. 全周期规划：`outputs/generated/workbench/<project_id>/lifecycle-plan.md`
-6. 工作台人工确认和阶段评审：`outputs/reviewed/workbench/<project_id>/`
-7. 工作台状态：`workspace/workbench/<project_id>/state.json`
+4. 工作台 AI 输出：`outputs/generated/workbench/`
+5. 全周期规划：`outputs/generated/workbench/lifecycle-plan.md`
+6. 工作台人工确认和阶段评审：`outputs/reviewed/workbench/`
+7. 工作台状态：`workspace/workbench/state.json`
 8. 标准资产包模板
 
 ## 输出
 
-写入 `outputs/generated/<project_id>/`：
+写入 `outputs/generated/asset-pack/`：
 
 - `review-report.md`
 - `asset-pack-draft.md`

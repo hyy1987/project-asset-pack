@@ -4,13 +4,13 @@
 
 ## 目录约定
 
-- 前期资料：`inputs/pre-project/<project_id>/`
+- 前期资料：`inputs/pre-project/`
 - 示例前期资料：`examples/sample-project/pre-project/`
-- AI 工作台输出：`outputs/generated/workbench/<project_id>/`
-- 人工评审输出：`outputs/reviewed/workbench/<project_id>/`
-- 工作台状态：`workspace/workbench/<project_id>/state.json`
-- 全周期规划：`outputs/generated/workbench/<project_id>/lifecycle-plan.md`
-- 新窗口恢复摘要：`outputs/generated/workbench/<project_id>/resume-brief.md`
+- AI 工作台输出：`outputs/generated/workbench/`
+- 人工评审输出：`outputs/reviewed/workbench/`
+- 工作台状态：`workspace/workbench/state.json`
+- 全周期规划：`outputs/generated/workbench/lifecycle-plan.md`
+- 新窗口恢复摘要：`outputs/generated/workbench/resume-brief.md`
 
 ## 新窗口恢复
 
@@ -24,15 +24,15 @@ python scripts/resume_project_workbench.py --project <project_id>
 
 这个命令会读取：
 
-- `workspace/workbench/<project_id>/state.json`
-- `outputs/reviewed/workbench/<project_id>/`
-- `outputs/generated/workbench/<project_id>/`
+- `workspace/workbench/state.json`
+- `outputs/reviewed/workbench/`
+- `outputs/generated/workbench/`
 - 当前阶段的计划、报告、资产包更新和评审记录
 
 并生成：
 
 ```text
-outputs/generated/workbench/<project_id>/resume-brief.md
+outputs/generated/workbench/resume-brief.md
 ```
 
 新窗口中的 Agent 应先阅读 `resume-brief.md`，再决定继续阶段执行、进入阶段评审、修订全周期规划、规划下一阶段，还是进行阶段性归档。只有状态文件不存在，或人类明确要求重建，才重新初始化工作台。
@@ -68,16 +68,16 @@ python scripts/start_active_project_workbench.py --project <project_id>
 
 这个命令会读取项目配置、业务仓库状态和资料目录；如果存在，也会读取已有资产包材料：
 
-- `outputs/generated/<project_id>/`
-- `outputs/reviewed/<project_id>/`
+- `outputs/generated/asset-pack/`
+- `outputs/reviewed/asset-pack/`
 
 并生成：
 
-- `outputs/generated/workbench/<project_id>/active-project-intake.md`
-- `outputs/generated/workbench/<project_id>/info-alignment.md`
-- `outputs/generated/workbench/<project_id>/risk-action-list.md`
-- `workspace/workbench/<project_id>/project-experience.md`
-- `workspace/workbench/<project_id>/state.json`
+- `outputs/generated/workbench/active-project-intake.md`
+- `outputs/generated/workbench/info-alignment.md`
+- `outputs/generated/workbench/risk-action-list.md`
+- `workspace/workbench/project-experience.md`
+- `workspace/workbench/state.json`
 
 接入完成后，不要直接进入阶段开发。先人工确认接入摘要、信息对齐稿和风险行动清单，再运行：
 
@@ -93,7 +93,7 @@ python scripts/plan_project_stage.py --project <project_id> --stage-id stage-nex
 新资料先进入资料接入记录，不直接改变阶段范围：
 
 ```powershell
-python scripts/record_material_intake.py --project <project_id> --source inputs/project-updates/<project_id>/<file> --title "资料标题" --material-type requirement-doc
+python scripts/record_material_intake.py --project <project_id> --source inputs/project-updates/<file> --title "资料标题" --material-type requirement-doc
 ```
 
 如果资料或聊天内容包含新增需求、需求变更、范围变化或验收标准变化，再记录 CR：
@@ -105,13 +105,13 @@ python scripts/record_change_request.py --project <project_id> --title "需求�
 资料接入输出：
 
 ```text
-outputs/generated/workbench/<project_id>/material-intake/
+outputs/generated/workbench/material-intake/
 ```
 
 需求变更输出：
 
 ```text
-outputs/generated/workbench/<project_id>/change-requests/
+outputs/generated/workbench/change-requests/
 ```
 
 CR 进入队列后，不要直接开发。必须先人工确认状态和目标阶段；进入当前阶段时更新阶段计划，进入后续阶段时更新全周期规划。

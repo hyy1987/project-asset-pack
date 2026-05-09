@@ -6,27 +6,27 @@
 
 1. `docs/agent-workflows/workbench-overview.md`
 2. `configs/projects/<project_id>.yaml`
-3. `workspace/workbench/<project_id>/state.json`
-4. `outputs/reviewed/workbench/<project_id>/`
-5. `outputs/generated/workbench/<project_id>/lifecycle-plan.md`
-6. `outputs/generated/workbench/<project_id>/`
+3. `workspace/workbench/state.json`
+4. `outputs/reviewed/workbench/`
+5. `outputs/generated/workbench/lifecycle-plan.md`
+6. `outputs/generated/workbench/`
 7. 当前阶段的 `stage-plan.md`、`stage-report.md`、`asset-pack-update.md`
 8. 当前阶段的 `quality-gate.md` 和 `experience-notes.md`，如果存在
-9. `workspace/workbench/<project_id>/project-experience.md`，如果存在
-10. `outputs/generated/workbench/<project_id>/resume-brief.md`
+9. `workspace/workbench/project-experience.md`，如果存在
+10. `outputs/generated/workbench/resume-brief.md`
 
 ## 输出
 
 更新或生成：
 
 ```text
-outputs/generated/workbench/<project_id>/resume-brief.md
+outputs/generated/workbench/resume-brief.md
 ```
 
 ## 规则
 
 1. 如果状态文件存在，不要重新初始化。
-2. 优先相信 `outputs/reviewed/workbench/<project_id>/` 中的人工确认和评审记录。
+2. 优先相信 `outputs/reviewed/workbench/` 中的人工确认和评审记录。
 3. `outputs/generated/` 中的内容只视为 AI 初稿。
 4. 明确告诉用户当前状态、当前阶段、已有产物、缺口和下一步建议。
 5. 如果全周期规划缺失，优先建议生成全周期规划。

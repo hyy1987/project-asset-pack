@@ -108,18 +108,30 @@ def main() -> int:
         raise RuntimeError("Remote creation requires --confirmed after human approval of repository split and naming.")
     if create_remote and not remote_base:
         raise RuntimeError("Remote creation requires git.remote_base_url in project config.")
+    if create_remote and not args.dry_run and shutil.which("gh") is None:
+        raise RuntimeError("GitHub CLI `gh` was not found. Install and login first, or create remotes manually.")
 
     repos = get_project_repositories(args.project)
     if not repos:
         print("No repositories configured.")
         return 1
 
+    planned: list[dict[str, str | Path]] = []
     for repo in repos:
         path = repo["path"]
         name = repo["name"]
         remote_name = repo_remote_name(args.project, name, prefix)
         remote = remote_url(remote_base, remote_name) if remote_base else ""
         remote_full_name = parse_github_repo(remote_base, remote_name) if create_remote else ""
+        planned.append(
+            {
+                "name": name,
+                "path": path,
+                "remote_name": remote_name,
+                "remote": remote,
+                "remote_full_name": remote_full_name,
+            }
+        )
 
         print(f"Repository: {name}")
         print(f"- Local path: {repo_relative(path)}")
@@ -130,6 +142,29 @@ def main() -> int:
         if create_remote:
             print(f"- Remote create target: {remote_full_name} ({remote_visibility})")
 
+    if not args.dry_run:
+        for item in planned:
+            path = item["path"]
+            name = str(item["name"])
+            remote = str(item["remote"])
+            if isinstance(path, Path) and (path / ".git").exists() and remote:
+                existing_origin = git_remote_url(path, "origin")
+                if existing_origin and existing_origin != remote:
+                    raise RuntimeError(
+                        f"Repository {name} already has a different origin. "
+                        f"Existing: {existing_origin}; expected: {remote}. Refusing to overwrite."
+                    )
+            if create_remote:
+                remote_full_name = str(item["remote_full_name"])
+                if gh_repo_exists(remote_full_name):
+                    raise RuntimeError(f"Remote repository already exists, refusing to overwrite: {remote_full_name}")
+
+    for item in planned:
+        path = item["path"]
+        name = str(item["name"])
+        remote = str(item["remote"])
+        remote_full_name = str(item["remote_full_name"])
+
         if args.dry_run:
             if create_remote:
                 create_github_repo(remote_full_name, remote_visibility, dry_run=True)
@@ -138,6 +173,8 @@ def main() -> int:
         if create_remote:
             create_github_repo(remote_full_name, remote_visibility, dry_run=False)
 
+        if not isinstance(path, Path):
+            raise RuntimeError(f"Invalid repository path for {name}: {path}")
         path.mkdir(parents=True, exist_ok=True)
         if not (path / ".git").exists():
             run_git(["init", "-b", default_branch], cwd=path)

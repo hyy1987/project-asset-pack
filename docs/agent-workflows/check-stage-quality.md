@@ -6,24 +6,24 @@
 
 1. `docs/agent-workflows/workbench-overview.md`
 2. `configs/projects/<project_id>.yaml`
-3. `workspace/workbench/<project_id>/project-experience.md`，如果存在
-4. `outputs/generated/workbench/<project_id>/lifecycle-plan.md`
-5. `outputs/generated/workbench/<project_id>/stages/<stage_id>/stage-plan.md`
-6. `outputs/generated/workbench/<project_id>/stages/<stage_id>/stage-report.md`
-7. `outputs/generated/workbench/<project_id>/stages/<stage_id>/asset-pack-update.md`
+3. `workspace/workbench/project-experience.md`，如果存在
+4. `outputs/generated/workbench/lifecycle-plan.md`
+5. `outputs/generated/workbench/stages/<stage_id>/stage-plan.md`
+6. `outputs/generated/workbench/stages/<stage_id>/stage-report.md`
+7. `outputs/generated/workbench/stages/<stage_id>/asset-pack-update.md`
 8. `templates/workbench/quality-gate.md`
-9. `outputs/generated/workbench/<project_id>/stages/<stage_id>/quality-command-results.md`，如果已执行质量命令
+9. `outputs/generated/workbench/stages/<stage_id>/quality-command-results.md`，如果已执行质量命令
 
 ## 输出
 
 写入：
 
 ```text
-outputs/generated/workbench/<project_id>/stages/<stage_id>/quality-gate.md
-outputs/generated/workbench/<project_id>/stages/<stage_id>/quality-command-results.md
+outputs/generated/workbench/stages/<stage_id>/quality-gate.md
+outputs/generated/workbench/stages/<stage_id>/quality-command-results.md
 ```
 
-更新 `workspace/workbench/<project_id>/state.json`。
+更新 `workspace/workbench/state.json`。
 
 ## 规则
 

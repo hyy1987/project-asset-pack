@@ -8,11 +8,11 @@
 2. `configs/projects/<project_id>.yaml`
 3. `workspace/snapshots/<project_id>-repo-baseline.json`
 4. 脚本提供的仓库变更摘要
-5. 当前生成资产包：`outputs/generated/<project_id>/`
+5. 当前生成资产包：`outputs/generated/asset-pack/`
 
 ## 输出
 
-更新 `outputs/generated/<project_id>/` 中受影响的资产包文件。
+更新 `outputs/generated/asset-pack/` 中受影响的资产包文件。
 
 ## 规则
 

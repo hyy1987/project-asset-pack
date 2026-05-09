@@ -6,13 +6,13 @@
 
 1. `docs/agent-workflows/workbench-overview.md`
 2. `configs/projects/<project_id>.yaml`
-3. `outputs/generated/workbench/<project_id>/info-alignment.md`
-4. `outputs/generated/workbench/<project_id>/project-kickoff-checklist.md`
-5. `outputs/generated/workbench/<project_id>/lifecycle-plan.md`
-6. `outputs/reviewed/workbench/<project_id>/human-confirmation.md`，如果存在
-7. `outputs/generated/workbench/<project_id>/material-intake/index.md`，如果存在
-8. `outputs/generated/workbench/<project_id>/change-requests/index.md`，如果存在
-9. `workspace/workbench/<project_id>/project-experience.md`，如果存在
+3. `outputs/generated/workbench/info-alignment.md`
+4. `outputs/generated/workbench/project-kickoff-checklist.md`
+5. `outputs/generated/workbench/lifecycle-plan.md`
+6. `outputs/reviewed/workbench/human-confirmation.md`，如果存在
+7. `outputs/generated/workbench/material-intake/index.md`，如果存在
+8. `outputs/generated/workbench/change-requests/index.md`，如果存在
+9. `workspace/workbench/project-experience.md`，如果存在
 10. `templates/workbench/stage-plan.md`
 
 ## 输出
@@ -20,10 +20,10 @@
 写入：
 
 ```text
-outputs/generated/workbench/<project_id>/stages/<stage_id>/stage-plan.md
+outputs/generated/workbench/stages/<stage_id>/stage-plan.md
 ```
 
-更新 `workspace/workbench/<project_id>/state.json`。
+更新 `workspace/workbench/state.json`。
 
 ## 规则
 

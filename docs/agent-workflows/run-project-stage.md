@@ -7,11 +7,11 @@
 1. `docs/agent-workflows/workbench-overview.md`
 2. 项目配置和安全规则
 3. 已确认的项目信息或人工确认记录
-4. `outputs/generated/workbench/<project_id>/lifecycle-plan.md`
-5. `outputs/generated/workbench/<project_id>/stages/<stage_id>/stage-plan.md`
-6. `outputs/generated/workbench/<project_id>/material-intake/index.md`，如果存在
-7. `outputs/generated/workbench/<project_id>/change-requests/index.md`，如果存在
-8. `workspace/workbench/<project_id>/project-experience.md`，如果存在
+4. `outputs/generated/workbench/lifecycle-plan.md`
+5. `outputs/generated/workbench/stages/<stage_id>/stage-plan.md`
+6. `outputs/generated/workbench/material-intake/index.md`，如果存在
+7. `outputs/generated/workbench/change-requests/index.md`，如果存在
+8. `workspace/workbench/project-experience.md`，如果存在
 9. 已接入的业务项目仓库和资料目录
 10. `templates/workbench/stage-report.md`
 11. `templates/workbench/quality-gate.md`
@@ -21,9 +21,9 @@
 写入：
 
 ```text
-outputs/generated/workbench/<project_id>/stages/<stage_id>/stage-report.md
-outputs/generated/workbench/<project_id>/stages/<stage_id>/asset-pack-update.md
-outputs/generated/workbench/<project_id>/stages/<stage_id>/quality-gate.md
+outputs/generated/workbench/stages/<stage_id>/stage-report.md
+outputs/generated/workbench/stages/<stage_id>/asset-pack-update.md
+outputs/generated/workbench/stages/<stage_id>/quality-gate.md
 ```
 
 必要时更新业务项目仓库中的代码，但必须遵守授权条件。

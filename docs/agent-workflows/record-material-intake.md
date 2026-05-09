@@ -6,22 +6,22 @@
 
 1. `docs/agent-workflows/workbench-overview.md`
 2. `configs/projects/<project_id>.yaml`
-3. `workspace/workbench/<project_id>/state.json`，如果存在
+3. `workspace/workbench/state.json`，如果存在
 4. 新资料来源：文件、目录、链接或聊天补充说明
 5. `templates/workbench/material-intake.md`
-6. 已有资料接入索引：`outputs/generated/workbench/<project_id>/material-intake/index.md`，如果存在
-7. 已有需求变更队列：`outputs/generated/workbench/<project_id>/change-requests/index.md`，如果存在
+6. 已有资料接入索引：`outputs/generated/workbench/material-intake/index.md`，如果存在
+7. 已有需求变更队列：`outputs/generated/workbench/change-requests/index.md`，如果存在
 
 ## 输出
 
 写入：
 
 ```text
-outputs/generated/workbench/<project_id>/material-intake/<material_id>.md
-outputs/generated/workbench/<project_id>/material-intake/index.md
+outputs/generated/workbench/material-intake/<material_id>.md
+outputs/generated/workbench/material-intake/index.md
 ```
 
-更新 `workspace/workbench/<project_id>/state.json`。
+更新 `workspace/workbench/state.json`。
 
 ## 规则
 

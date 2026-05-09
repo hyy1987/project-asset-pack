@@ -119,8 +119,8 @@ def main() -> int:
             f"Stage id: {args.stage_id}",
             f"Stage title: {title}",
             f"Human review decision: {args.decision}",
-            f"Stage review output: outputs/reviewed/workbench/{args.project}/stages/{args.stage_id}/stage-review.md",
-            f"Stage experience output: outputs/generated/workbench/{args.project}/stages/{args.stage_id}/experience-notes.md",
+            f"Stage review output: {repo_relative(review_path)}",
+            f"Stage experience output: {repo_relative(experience_path)}",
         ],
         label=f"Review stage {args.stage_id} for {args.project}",
     )

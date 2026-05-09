@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 from __future__ import annotations
 
 import argparse
@@ -20,6 +20,7 @@ from _common import (
     save_workbench_state,
     selected_agent,
     utc_now,
+    workbench_state_path,
 )
 
 
@@ -81,53 +82,53 @@ def main() -> int:
     for stage_id, stage in sorted(stages.items()):
         stage_lines.extend(
             [
-                f"- 阶段 ID：{stage_id}",
-                f"  - 名称：{stage.get('title', '待确认')}",
-                f"  - 状态：{stage.get('status', '待确认')}",
-                f"  - 计划：{stage.get('plan', '待确认')}",
-                f"  - 报告：{stage.get('report', '待确认')}",
-                f"  - 质量门禁：{stage.get('quality_gate', '待确认')}",
-                f"  - 评审：{stage.get('review', '待确认')}",
-                f"  - 阶段经验：{stage.get('experience_notes', '待确认')}",
+                f"- 闃舵 ID锛歿stage_id}",
+                f"  - 鍚嶇О锛歿stage.get('title', '寰呯‘璁?)}",
+                f"  - 鐘舵€侊細{stage.get('status', '寰呯‘璁?)}",
+                f"  - 璁″垝锛歿stage.get('plan', '寰呯‘璁?)}",
+                f"  - 鎶ュ憡锛歿stage.get('report', '寰呯‘璁?)}",
+                f"  - 璐ㄩ噺闂ㄧ锛歿stage.get('quality_gate', '寰呯‘璁?)}",
+                f"  - 璇勫锛歿stage.get('review', '寰呯‘璁?)}",
+                f"  - 闃舵缁忛獙锛歿stage.get('experience_notes', '寰呯‘璁?)}",
             ]
         )
-    archive_summary = f"""# 工作台结题归档摘要
+    archive_summary = f"""# 宸ヤ綔鍙扮粨棰樺綊妗ｆ憳瑕?
 
-项目：{project_name}
+椤圭洰锛歿project_name}
 
-项目 ID：{args.project}
+椤圭洰 ID锛歿args.project}
 
-生成时间：{utc_now()}
+鐢熸垚鏃堕棿锛歿utc_now()}
 
-## 工作台状态
+## 宸ヤ綔鍙扮姸鎬?
 
-- 当前状态：{state.get('status', '待确认')}
-- 当前阶段：{state.get('current_stage_id', '待确认')}
-- 最近通过阶段：{state.get('last_approved_stage_id', '待确认')}
-- 全周期规划：{state.get('lifecycle_plan', '待确认')}
-- 项目经验库：{state.get('project_experience', '待确认')}
-- 长期规则候选：{state.get('rule_candidates', '待确认')}
+- 褰撳墠鐘舵€侊細{state.get('status', '寰呯‘璁?)}
+- 褰撳墠闃舵锛歿state.get('current_stage_id', '寰呯‘璁?)}
+- 鏈€杩戦€氳繃闃舵锛歿state.get('last_approved_stage_id', '寰呯‘璁?)}
+- 鍏ㄥ懆鏈熻鍒掞細{state.get('lifecycle_plan', '寰呯‘璁?)}
+- 椤圭洰缁忛獙搴擄細{state.get('project_experience', '寰呯‘璁?)}
+- 闀挎湡瑙勫垯鍊欓€夛細{state.get('rule_candidates', '寰呯‘璁?)}
 
-## 前期资料
+## 鍓嶆湡璧勬枡
 
-{chr(10).join(f'- {item}' for item in list_material_files(args.project)) or '- 未发现前期资料。'}
+{chr(10).join(f'- {item}' for item in list_material_files(args.project)) or '- 鏈彂鐜板墠鏈熻祫鏂欍€?}
 
-## 工作台输入输出
+## 宸ヤ綔鍙拌緭鍏ヨ緭鍑?
 
-- 工作台 AI 输出：{repo_relative(workbench_generated)}
-- 工作台人工确认与评审：{repo_relative(workbench_reviewed)}
-- 工作台状态文件：workspace/workbench/{args.project}/state.json
-- 全周期规划文件：{state.get('lifecycle_plan', '待确认')}
-- 项目经验库：{state.get('project_experience', '待确认')}
-- 长期规则候选：{state.get('rule_candidates', '待确认')}
+- 宸ヤ綔鍙?AI 杈撳嚭锛歿repo_relative(workbench_generated)}
+- 宸ヤ綔鍙颁汉宸ョ‘璁や笌璇勫锛歿repo_relative(workbench_reviewed)}
+- 宸ヤ綔鍙扮姸鎬佹枃浠讹細{repo_relative(workbench_state_path(args.project))}
+- 鍏ㄥ懆鏈熻鍒掓枃浠讹細{state.get('lifecycle_plan', '寰呯‘璁?)}
+- 椤圭洰缁忛獙搴擄細{state.get('project_experience', '寰呯‘璁?)}
+- 闀挎湡瑙勫垯鍊欓€夛細{state.get('rule_candidates', '寰呯‘璁?)}
 
-## 阶段记录
+## 闃舵璁板綍
 
-{chr(10).join(stage_lines) if stage_lines else '- 未发现阶段记录。'}
+{chr(10).join(stage_lines) if stage_lines else '- 鏈彂鐜伴樁娈佃褰曘€?}
 
-## 归档说明
+## 褰掓。璇存槑
 
-本摘要用于把工作台过程资料汇总为标准项目资产包初稿。归档结果仍为 AI 初稿，必须经过人工评审后才能定稿。
+鏈憳瑕佺敤浜庢妸宸ヤ綔鍙拌繃绋嬭祫鏂欐眹鎬讳负鏍囧噯椤圭洰璧勪骇鍖呭垵绋裤€傚綊妗ｇ粨鏋滀粛涓?AI 鍒濈锛屽繀椤荤粡杩囦汉宸ヨ瘎瀹″悗鎵嶈兘瀹氱銆?
 """
     created.append(write_text_if_needed(out_dir / "workbench-archive-summary.md", archive_summary, args.overwrite))
 

@@ -12,7 +12,7 @@
 
 ## 输出
 
-写入 `outputs/generated/<project_id>/`：
+写入 `outputs/generated/asset-pack/`：
 
 - `review-report.md`
 - `asset-pack-draft.md`

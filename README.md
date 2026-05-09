@@ -1,4 +1,4 @@
-﻿# Project Asset Pack
+# Project Asset Pack
 
 支持 Claude Code 和 Codex 的项目资产包生成、评审、在研项目辅助检查和 Agent-First 软件外包项目工作台。
 
@@ -91,10 +91,10 @@ repositories:
     path: ../my-project/database
 ```
 
-然后运行：
+先让 Agent 或人工干跑检查将要创建的仓库：
 
 ```powershell
-python scripts/init_project_repositories.py --project my-project
+python scripts/init_project_repositories.py --project my-project --dry-run
 ```
 
 脚本会创建缺失的本地仓库目录，执行 `git init`，并按 `remote_base_url/<project_id>-name.git` 设置 `origin`。例如上面的 `frontend` 会得到 `git@github.com:your-org/my-project-frontend.git`。如果确实需要覆盖仓库名前缀，可以额外配置 `git.repo_name_prefix`。
@@ -250,7 +250,7 @@ claude
 Agent 客户端的聊天历史不是工作台进度来源。工作台进度记录在：
 
 ```text
-workspace/workbench/<project_id>/state.json
+../<project_id>/<project_id>-docs/workspace/workbench/state.json
 ```
 
 如果新窗口不知道当前进度，先运行：
@@ -274,7 +274,7 @@ python scripts/resume_project_workbench.py --project my-project
 它会生成：
 
 ```text
-outputs/generated/workbench/my-project/resume-brief.md
+../my-project/my-project-docs/outputs/generated/workbench/resume-brief.md
 ```
 
 新窗口中的 Agent 应先读取这份恢复摘要，再继续阶段执行、阶段评审、全周期规划修订、下一阶段规划或归档。只有状态文件不存在，或人类明确要求重建，才重新初始化。
@@ -304,18 +304,18 @@ python scripts/start_active_project_workbench.py --project my-project
 脚本会优先读取项目配置中的业务仓库和资料目录；如果已有下面这些资产包材料，也会作为可选上下文读取：
 
 ```text
-outputs/generated/my-project/
-outputs/reviewed/my-project/
+../my-project/my-project-docs/outputs/generated/asset-pack/
+../my-project/my-project-docs/outputs/reviewed/asset-pack/
 ```
 
 接入输出包括：
 
 ```text
-outputs/generated/workbench/my-project/active-project-intake.md
-outputs/generated/workbench/my-project/info-alignment.md
-outputs/generated/workbench/my-project/risk-action-list.md
-workspace/workbench/my-project/state.json
-workspace/workbench/my-project/project-experience.md
+../my-project/my-project-docs/outputs/generated/workbench/active-project-intake.md
+../my-project/my-project-docs/outputs/generated/workbench/info-alignment.md
+../my-project/my-project-docs/outputs/generated/workbench/risk-action-list.md
+../my-project/my-project-docs/workspace/workbench/state.json
+../my-project/my-project-docs/workspace/workbench/project-experience.md
 ```
 
 接入后不要直接执行阶段开发。先人工确认 `active-project-intake.md`、`info-alignment.md` 和 `risk-action-list.md`，再生成或修订全周期规划：
@@ -336,19 +336,19 @@ python scripts/plan_project_stage.py --project my-project --stage-id stage-next 
 建议把甲方新发资料放到：
 
 ```text
-inputs/project-updates/my-project/
+../my-project/my-project-docs/inputs/project-updates/
 ```
 
 然后记录资料接入：
 
 ```powershell
-python scripts/record_material_intake.py --project my-project --source inputs/project-updates/my-project/2026-05-08-new-prd.md --title "新版本需求文档" --material-type requirement-doc
+python scripts/record_material_intake.py --project my-project --source inputs/project-updates/2026-05-08-new-prd.md --title "新版本需求文档" --material-type requirement-doc
 ```
 
 输出到：
 
 ```text
-outputs/generated/workbench/my-project/material-intake/
+../my-project/my-project-docs/outputs/generated/workbench/material-intake/
 |-- MI-2026-001.md
 `-- index.md
 ```
@@ -366,7 +366,7 @@ python scripts/record_change_request.py --project my-project --title "新增导�
 输出到：
 
 ```text
-outputs/generated/workbench/my-project/change-requests/
+../my-project/my-project-docs/outputs/generated/workbench/change-requests/
 |-- CR-2026-001.md
 `-- index.md
 ```
@@ -401,14 +401,14 @@ Copy-Item configs/projects/sample-project.yaml configs/projects/my-project.yaml
 把允许进入项目工作区的前期资料放到：
 
 ```text
-inputs/pre-project/my-project/
+../my-project/my-project-docs/inputs/pre-project/
 ```
 
 并在 `configs/projects/my-project.yaml` 中配置：
 
 ```yaml
 workbench:
-  pre_project_materials: inputs/pre-project/my-project
+  pre_project_materials: inputs/pre-project
   allow_code_changes: false
 ```
 
@@ -551,7 +551,7 @@ python scripts/check_stage_quality.py --project my-project --stage-id stage-1 --
 如果项目配置了 `quality.commands`、`quality.runtime` 或 `quality.smoke`，脚本会实际执行构建、测试、检查、启动服务和冒烟请求，并把结果写入：
 
 ```text
-outputs/generated/workbench/my-project/stages/stage-1/quality-command-results.md
+../my-project/my-project-docs/outputs/generated/workbench/stages/stage-1/quality-command-results.md
 ```
 
 命令、启动检查或冒烟检查失败时，严格模式会阻止进入通过评审。
@@ -614,9 +614,9 @@ python scripts/summarize_stage_experience.py --project my-project --stage-id sta
 阶段经验会写入：
 
 ```text
-outputs/generated/workbench/my-project/stages/stage-1/experience-notes.md
-workspace/workbench/my-project/project-experience.md
-outputs/generated/workbench/my-project/rule-candidates.md
+../my-project/my-project-docs/outputs/generated/workbench/stages/stage-1/experience-notes.md
+../my-project/my-project-docs/workspace/workbench/project-experience.md
+../my-project/my-project-docs/outputs/generated/workbench/rule-candidates.md
 ```
 
 阶段通过后，不要直接凭聊天继续做下一期。先检查全周期规划是否需要调整：
@@ -819,7 +819,7 @@ Claude Code 快捷命令：
 项目启动输出到：
 
 ```text
-outputs/generated/workbench/my-project/
+../my-project/my-project-docs/outputs/generated/workbench/
 |-- active-project-intake.md
 |-- info-alignment.md
 |-- project-kickoff-checklist.md
@@ -833,7 +833,7 @@ outputs/generated/workbench/my-project/
 阶段输出到：
 
 ```text
-outputs/generated/workbench/my-project/stages/stage-1/
+../my-project/my-project-docs/outputs/generated/workbench/stages/stage-1/
 |-- stage-plan.md
 |-- stage-report.md
 `-- asset-pack-update.md
@@ -842,7 +842,7 @@ outputs/generated/workbench/my-project/stages/stage-1/
 人工确认和阶段评审输出到：
 
 ```text
-outputs/reviewed/workbench/my-project/
+../my-project/my-project-docs/outputs/reviewed/workbench/
 |-- human-confirmation.md
 `-- stages/stage-1/stage-review.md
 ```
@@ -850,13 +850,13 @@ outputs/reviewed/workbench/my-project/
 工作台状态保存到：
 
 ```text
-workspace/workbench/my-project/state.json
+../my-project/my-project-docs/workspace/workbench/state.json
 ```
 
 工作台结题归档会复用标准资产包输出目录：
 
 ```text
-outputs/generated/my-project/
+../my-project/my-project-docs/outputs/generated/asset-pack/
 |-- review-report.md
 |-- asset-pack-draft.md
 |-- missing-materials.md
@@ -865,7 +865,7 @@ outputs/generated/my-project/
 `-- workbench-archive-summary.md
 ```
 
-这些仍是 AI 初稿，必须经过 `review_asset_pack.py` 人工评审后才能进入 `outputs/reviewed/my-project/`。
+这些仍是 AI 初稿，必须经过 `review_asset_pack.py` 人工评审后才能进入 `../my-project/my-project-docs/outputs/reviewed/asset-pack/`。
 
 ## 多项目和多团队使用方式
 
@@ -878,14 +878,14 @@ outputs/generated/my-project/
 ```text
 configs/projects/project-a.yaml
 configs/projects/project-b.yaml
-inputs/pre-project/project-a/
-inputs/pre-project/project-b/
-outputs/generated/workbench/project-a/
-outputs/generated/workbench/project-b/
-outputs/reviewed/workbench/project-a/
-outputs/reviewed/workbench/project-b/
-workspace/workbench/project-a/
-workspace/workbench/project-b/
+../project-a/project-a-docs/inputs/pre-project/
+../project-b/project-b-docs/inputs/pre-project/
+../project-a/project-a-docs/outputs/generated/workbench/
+../project-b/project-b-docs/outputs/generated/workbench/
+../project-a/project-a-docs/outputs/reviewed/workbench/
+../project-b/project-b-docs/outputs/reviewed/workbench/
+../project-a/project-a-docs/workspace/workbench/
+../project-b/project-b-docs/workspace/workbench/
 ```
 
 如果公司内有多个工作组，或者不同项目之间存在明显权限边界，建议按团队或按项目 fork 多个工作台：

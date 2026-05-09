@@ -15,7 +15,7 @@ docs/agent-workflows/
 1. `docs/agent-workflows/workbench-overview.md`
 2. 对应任务的 `docs/agent-workflows/<task>.md`
 3. `configs/projects/<project_id>.yaml`
-4. `workspace/workbench/<project_id>/state.json`，如果存在
+4. `workspace/workbench/state.json`，如果存在
 5. `outputs/reviewed/` 中已经人工确认或评审的内容
 6. `outputs/generated/` 中的 AI 初稿和阶段输出
 
@@ -42,7 +42,7 @@ docs/agent-workflows/
 /record-change-request my-project 新增导出功能
 ```
 
-新窗口、上下文丢失或中途恢复时，如果 `workspace/workbench/<project_id>/state.json` 存在，不要提示用户重新初始化。先读取：
+新窗口、上下文丢失或中途恢复时，如果 `workspace/workbench/state.json` 存在，不要提示用户重新初始化。先读取：
 
 ```text
 docs/agent-workflows/resume-project-workbench.md

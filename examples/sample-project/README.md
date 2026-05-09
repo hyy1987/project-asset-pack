@@ -100,7 +100,7 @@ codex
 7. 查看输出目录：
 
 ```text
-outputs/generated/workbench/sample-project/
+../sample-project/sample-project-docs/outputs/generated/workbench/
 ```
 
 重点检查：

@@ -228,8 +228,8 @@ def main() -> int:
         [
             f"Project id: {args.project}",
             f"Security rule set: {project_security_rule_set(args.project)}",
-            f"Workbench state: workspace/workbench/{args.project}/state.json",
-            f"Resume brief: outputs/generated/workbench/{args.project}/resume-brief.md",
+            f"Workbench state: {repo_relative(state_path)}",
+            f"Resume brief: {repo_relative(resume_path)}",
             f"Current stage id: {stage_id or '<none>'}",
             f"Current status: {state.get('status')}",
             f"Lifecycle plan: {state.get('lifecycle_plan', '<missing>')}",

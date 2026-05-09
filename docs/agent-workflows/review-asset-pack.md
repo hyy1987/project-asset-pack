@@ -1,18 +1,18 @@
 # 人工评审后整理正式资产包
 
-用于把 `outputs/generated/<project_id>/` 下的 AI 初稿，结合人工评审意见，整理为正式项目资产包。
+用于把 `outputs/generated/asset-pack/` 下的 AI 初稿，结合人工评审意见，整理为正式项目资产包。
 
 ## 输入
 
 1. `docs/agent-workflows/workbench-overview.md`
-2. `outputs/generated/<project_id>/`
+2. `outputs/generated/asset-pack/`
 3. 人工评审意见，默认从 `docs/manual/review-comments/<project_id>.md` 读取
 4. `configs/projects/<project_id>.yaml`
 5. `configs/security-rules/<rule_set>.md`
 
 ## 输出
 
-写入 `outputs/reviewed/<project_id>/`。
+写入 `outputs/reviewed/asset-pack/`。
 
 ## 规则
 

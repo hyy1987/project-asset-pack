@@ -15,7 +15,7 @@ docs/agent-workflows/
 1. `docs/agent-workflows/workbench-overview.md`
 2. 对应任务的 `docs/agent-workflows/<task>.md`
 3. `configs/projects/<project_id>.yaml`
-4. `workspace/workbench/<project_id>/state.json`，如果存在
+4. `workspace/workbench/state.json`，如果存在
 5. `outputs/reviewed/` 中已经人工确认或评审的内容
 6. `outputs/generated/` 中的 AI 初稿和阶段输出
 

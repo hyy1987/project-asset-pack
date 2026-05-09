@@ -6,7 +6,7 @@
 
 1. 项目已经在开发或维护中，后续希望用工作台管理阶段计划、开发执行、质量门禁和评审。
 2. 项目可能尚未生成资产包，不要求先补做。
-3. 项目可能已有 `outputs/generated/<project_id>/` 或 `outputs/reviewed/<project_id>/`，这些只作为可选上下文。
+3. 项目可能已有 `outputs/generated/asset-pack/` 或 `outputs/reviewed/asset-pack/`，这些只作为可选上下文。
 
 ## 输入
 
@@ -14,9 +14,9 @@
 2. `configs/projects/<project_id>.yaml`
 3. `configs/security-rules/<rule_set>.md`
 4. 业务项目仓库和资料目录，以项目配置为准
-5. 前期资料目录：`inputs/pre-project/<project_id>/` 或配置中声明的目录，如果存在
-6. 已有 AI 资产包初稿：`outputs/generated/<project_id>/`，如果存在
-7. 已有人工评审资产包：`outputs/reviewed/<project_id>/`，如果存在
+5. 前期资料目录：`inputs/pre-project/` 或配置中声明的目录，如果存在
+6. 已有 AI 资产包初稿：`outputs/generated/asset-pack/`，如果存在
+7. 已有人工评审资产包：`outputs/reviewed/asset-pack/`，如果存在
 8. `templates/workbench/active-project-intake.md`
 9. `templates/workbench/info-alignment.md`
 10. `templates/workbench/project-kickoff-checklist.md`
@@ -26,7 +26,7 @@
 
 ## 输出
 
-写入 `outputs/generated/workbench/<project_id>/`：
+写入 `outputs/generated/workbench/`：
 
 - `active-project-intake.md`
 - `info-alignment.md`
@@ -38,8 +38,8 @@
 必要时写入或更新：
 
 ```text
-workspace/workbench/<project_id>/project-experience.md
-workspace/workbench/<project_id>/state.json
+workspace/workbench/project-experience.md
+workspace/workbench/state.json
 ```
 
 ## 规则

@@ -75,7 +75,7 @@ def main() -> int:
             f"Project id: {args.project}",
             f"Security rule set: {project_security_rule_set(args.project)}",
             f"Pre-project material directory: {material_dir}",
-            f"Generated workbench directory: outputs/generated/workbench/{args.project}/",
+            f"Generated workbench directory: {repo_relative(out_dir)}",
             "Generate or update info alignment, kickoff checklist, responsibility questions, asset pack skeleton, and risk/action list.",
         ],
         label=f"Initialize Agent-First workbench for {args.project}",

@@ -199,7 +199,7 @@ def main() -> int:
         [
             f"Project id: {args.project}",
             f"Security rule set: {project_security_rule_set(args.project)}",
-            f"Active project intake summary: outputs/generated/workbench/{args.project}/active-project-intake.md",
+            f"Active project intake summary: {repo_relative(created[0])}",
             f"Generated asset pack directory, optional: {repo_relative(generated_asset_dir)}",
             f"Reviewed asset pack directory, optional: {repo_relative(reviewed_asset_dir)}",
             f"Project experience file: {project_experience}",

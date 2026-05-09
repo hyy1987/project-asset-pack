@@ -7,7 +7,7 @@
 1. `docs/agent-workflows/workbench-overview.md`
 2. `configs/projects/<project_id>.yaml`
 3. `configs/security-rules/<rule_set>.md`
-4. `inputs/pre-project/<project_id>/` 或配置中声明的前期资料目录
+4. `inputs/pre-project/` 或配置中声明的前期资料目录
 5. `templates/workbench/info-alignment.md`
 6. `templates/workbench/project-kickoff-checklist.md`
 7. `templates/workbench/responsibility-questions.md`
@@ -16,7 +16,7 @@
 
 ## 输出
 
-写入 `outputs/generated/workbench/<project_id>/`：
+写入 `outputs/generated/workbench/`：
 
 - `info-alignment.md`
 - `project-kickoff-checklist.md`
@@ -24,7 +24,7 @@
 - `asset-pack-skeleton.md`
 - `risk-action-list.md`
 
-更新 `workspace/workbench/<project_id>/state.json`。
+更新 `workspace/workbench/state.json`。
 
 ## 规则
 

@@ -8,7 +8,7 @@
 2. `configs/projects/<project_id>.yaml`
 3. `configs/security-rules/<rule_set>.md`
 4. 项目仓库和资料目录
-5. 当前生成资产包：`outputs/generated/<project_id>/`
+5. 当前生成资产包：`outputs/generated/asset-pack/`
 6. 上一次体检报告，如果存在
 7. `templates/health-check/health-check.md`
 

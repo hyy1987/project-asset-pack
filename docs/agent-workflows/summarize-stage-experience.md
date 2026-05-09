@@ -5,11 +5,11 @@
 ## 输入
 
 1. `docs/agent-workflows/workbench-overview.md`
-2. `outputs/generated/workbench/<project_id>/stages/<stage_id>/stage-report.md`
-3. `outputs/generated/workbench/<project_id>/stages/<stage_id>/quality-gate.md`
-4. `outputs/reviewed/workbench/<project_id>/stages/<stage_id>/stage-review.md`
-5. `workspace/workbench/<project_id>/project-experience.md`，如果存在
-6. `outputs/generated/workbench/<project_id>/rule-candidates.md`，如果存在
+2. `outputs/generated/workbench/stages/<stage_id>/stage-report.md`
+3. `outputs/generated/workbench/stages/<stage_id>/quality-gate.md`
+4. `outputs/reviewed/workbench/stages/<stage_id>/stage-review.md`
+5. `workspace/workbench/project-experience.md`，如果存在
+6. `outputs/generated/workbench/rule-candidates.md`，如果存在
 7. `templates/workbench/experience-notes.md`
 
 ## 输出
@@ -17,12 +17,12 @@
 写入或更新：
 
 ```text
-outputs/generated/workbench/<project_id>/stages/<stage_id>/experience-notes.md
-workspace/workbench/<project_id>/project-experience.md
-outputs/generated/workbench/<project_id>/rule-candidates.md
+outputs/generated/workbench/stages/<stage_id>/experience-notes.md
+workspace/workbench/project-experience.md
+outputs/generated/workbench/rule-candidates.md
 ```
 
-更新 `workspace/workbench/<project_id>/state.json`。
+更新 `workspace/workbench/state.json`。
 
 ## 规则
 

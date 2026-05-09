@@ -5,10 +5,10 @@
 ## 输入
 
 1. `docs/agent-workflows/workbench-overview.md`
-2. `outputs/generated/workbench/<project_id>/lifecycle-plan.md`
-3. `outputs/generated/workbench/<project_id>/stages/<stage_id>/stage-plan.md`
-4. `outputs/generated/workbench/<project_id>/stages/<stage_id>/stage-report.md`
-5. `outputs/generated/workbench/<project_id>/stages/<stage_id>/quality-gate.md`
+2. `outputs/generated/workbench/lifecycle-plan.md`
+3. `outputs/generated/workbench/stages/<stage_id>/stage-plan.md`
+4. `outputs/generated/workbench/stages/<stage_id>/stage-report.md`
+5. `outputs/generated/workbench/stages/<stage_id>/quality-gate.md`
 6. 人工评审意见，默认从 `docs/manual/stage-reviews/<project_id>/<stage_id>.md` 读取
 7. `templates/workbench/stage-review.md`
 8. `templates/workbench/experience-notes.md`
@@ -18,11 +18,11 @@
 写入：
 
 ```text
-outputs/reviewed/workbench/<project_id>/stages/<stage_id>/stage-review.md
-outputs/generated/workbench/<project_id>/stages/<stage_id>/experience-notes.md
+outputs/reviewed/workbench/stages/<stage_id>/stage-review.md
+outputs/generated/workbench/stages/<stage_id>/experience-notes.md
 ```
 
-更新 `workspace/workbench/<project_id>/state.json`。
+更新 `workspace/workbench/state.json`。
 
 ## 规则
 

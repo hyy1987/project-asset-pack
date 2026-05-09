@@ -66,16 +66,16 @@ Claude Code、Codex 或其他 Agent 客户端都应读取这里的规则。`.cla
 执行任何项目工作前，按顺序读取：
 
 1. `configs/projects/<project_id>.yaml`
-2. `workspace/workbench/<project_id>/state.json`，如果存在
-3. `outputs/generated/workbench/<project_id>/resume-brief.md`，如果存在
+2. `workspace/workbench/state.json`，如果存在
+3. `outputs/generated/workbench/resume-brief.md`，如果存在
 4. `configs/security-rules/<rule_set>.md`
-5. `inputs/pre-project/<project_id>/` 或配置中声明的前期资料目录
-6. `outputs/reviewed/workbench/<project_id>/` 中已经人工确认的信息
-7. `outputs/generated/workbench/<project_id>/lifecycle-plan.md`，如果存在
-8. `workspace/workbench/<project_id>/project-experience.md`，如果存在
-9. `outputs/generated/workbench/<project_id>/` 中的 AI 初稿和阶段输出
-10. `outputs/reviewed/<project_id>/` 中已有的正式资产包，如果存在
-11. `outputs/generated/<project_id>/` 中已有的资产包初稿，如果存在
+5. `inputs/pre-project/` 或配置中声明的前期资料目录
+6. `outputs/reviewed/workbench/` 中已经人工确认的信息
+7. `outputs/generated/workbench/lifecycle-plan.md`，如果存在
+8. `workspace/workbench/project-experience.md`，如果存在
+9. `outputs/generated/workbench/` 中的 AI 初稿和阶段输出
+10. `outputs/reviewed/asset-pack/` 中已有的正式资产包，如果存在
+11. `outputs/generated/asset-pack/` 中已有的资产包初稿，如果存在
 12. 对应任务的 `docs/agent-workflows/*.md`
 13. `templates/**`
 14. 已通过 Agent 客户端接入的业务仓库和资料目录
@@ -85,11 +85,11 @@ Claude Code、Codex 或其他 Agent 客户端都应读取这里的规则。`.cla
 
 - AI 初稿：`outputs/generated/`
 - 人工评审结果：`outputs/reviewed/`
-- 工作台状态：`workspace/workbench/<project_id>/state.json`
-- 项目经验库：`workspace/workbench/<project_id>/project-experience.md`
-- 新窗口恢复摘要：`outputs/generated/workbench/<project_id>/resume-brief.md`
-- 新资料接入：`outputs/generated/workbench/<project_id>/material-intake/`
-- 需求变更队列：`outputs/generated/workbench/<project_id>/change-requests/`
+- 工作台状态：`workspace/workbench/state.json`
+- 项目经验库：`workspace/workbench/project-experience.md`
+- 新窗口恢复摘要：`outputs/generated/workbench/resume-brief.md`
+- 新资料接入：`outputs/generated/workbench/material-intake/`
+- 需求变更队列：`outputs/generated/workbench/change-requests/`
 
 AI 输出只能作为初稿。正式材料必须经过人工评审后进入 `outputs/reviewed/`。
 
