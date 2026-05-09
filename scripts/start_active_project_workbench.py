@@ -7,7 +7,6 @@ from pathlib import Path
 from typing import Any
 
 from _common import (
-    REPO_ROOT,
     add_agent_argument,
     ensure_workbench_dirs,
     generated_asset_pack_dir,
@@ -15,12 +14,12 @@ from _common import (
     get_project_repositories,
     invoke_agent_skill,
     list_material_files,
-    load_project_config,
     load_workbench_state,
     pre_project_materials_dir,
     project_experience_path,
     project_security_rule_set,
     repo_relative,
+    reviewed_asset_pack_dir,
     run_git,
     save_workbench_state,
     selected_agent,
@@ -55,11 +54,6 @@ def format_list(items: list[str], empty: str) -> str:
     if not items:
         return f"- {empty}"
     return "\n".join(f"- {item}" for item in items)
-
-
-def reviewed_asset_pack_dir(project_id: str) -> Path:
-    config = load_project_config(project_id)
-    return REPO_ROOT / config.get("output", {}).get("reviewed", f"outputs/reviewed/{project_id}")
 
 
 def repository_status_lines(project_id: str) -> tuple[list[str], list[dict[str, Any]]]:

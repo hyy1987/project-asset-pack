@@ -32,7 +32,7 @@ def main() -> int:
     args = parse_args()
     out_dir = stage_generated_dir(args.project, args.stage_id)
     state = load_workbench_state(args.project)
-    lifecycle_plan = state.get("lifecycle_plan") or f"outputs/generated/workbench/{args.project}/lifecycle-plan.md"
+    lifecycle_plan = state.get("lifecycle_plan") or repo_relative(out_dir.parent.parent / "lifecycle-plan.md")
     values = {
         "project_id": args.project,
         "stage_id": args.stage_id,
@@ -72,9 +72,9 @@ def main() -> int:
             f"Stage title: {args.title}",
             f"Security rule set: {project_security_rule_set(args.project)}",
             f"Lifecycle plan: {lifecycle_plan}",
-            f"Material intake index, if any: outputs/generated/workbench/{args.project}/material-intake/index.md",
-            f"Change request index, if any: outputs/generated/workbench/{args.project}/change-requests/index.md",
-            f"Stage plan output: outputs/generated/workbench/{args.project}/stages/{args.stage_id}/stage-plan.md",
+            f"Material intake index, if any: {repo_relative(out_dir.parent.parent / 'material-intake' / 'index.md')}",
+            f"Change request index, if any: {repo_relative(out_dir.parent.parent / 'change-requests' / 'index.md')}",
+            f"Stage plan output: {repo_relative(plan_path)}",
             "Stage plan must follow the lifecycle plan. If the lifecycle plan is missing or outdated, ask to create or revise it first.",
             "Only include change requests in this stage when their status and target stage are human-confirmed.",
         ],

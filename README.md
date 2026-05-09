@@ -1,4 +1,4 @@
-# Project Asset Pack
+﻿# Project Asset Pack
 
 支持 Claude Code 和 Codex 的项目资产包生成、评审、在研项目辅助检查和 Agent-First 软件外包项目工作台。
 
@@ -45,14 +45,32 @@ project-asset-pack/
 |-- configs/      项目接入配置和安全规则
 |-- docs/         通用 Agent 工作流、使用手册、人工补充和评审意见
 |-- examples/     可提交的示例项目材料
-|-- inputs/       真实项目前期资料输入区，默认不提交
-|-- outputs/      AI 初稿、人工评审结果和发布产物，默认不提交
 |-- scripts/      自动化脚本
 |-- templates/    资产包和工作台输出模板
 |-- AGENTS.md     Codex 入口说明
 |-- CLAUDE.md     Claude Code 入口说明
-`-- workspace/    状态、日志和快照，默认不提交
 ```
+
+`project-asset-pack` 是工具仓库，只保存模板、脚本、通用规则和项目接入配置。真实项目的默认工作区放在它的同级目录：
+
+```text
+my-project/
+|-- my-project-docs/
+|   |-- inputs/
+|   |   |-- pre-project/
+|   |   `-- project-updates/
+|   |-- outputs/
+|   |   |-- generated/
+|   |   `-- reviewed/
+|   `-- workspace/
+|       |-- workbench/
+|       `-- snapshots/
+|-- frontend/
+|-- backend/
+`-- database/
+```
+
+默认规则是：业务代码仓库、数据库仓库和项目资料仓库跟 `project-asset-pack` 平级，项目过程材料进入 `<project_id>/<project_id>-docs/`。如果某个项目已有自己的目录规范，可以在 `configs/projects/<project_id>.yaml` 中覆盖 `workbench.project_docs_root`、`workbench.pre_project_materials`、`repositories.path`、`output.generated` 和 `output.reviewed`。
 
 ## 快速验证 sample-project
 
@@ -62,7 +80,7 @@ project-asset-pack/
 examples/sample-project/pre-project/
 ```
 
-`configs/projects/sample-project.yaml` 已经指向这个目录。
+`configs/projects/sample-project.yaml` 使用新的默认项目空间。脚本会在 `../sample-project/sample-project-docs/` 下创建 `inputs/`、`outputs/` 和 `workspace/`；仓库内的 `examples/sample-project/pre-project/` 只作为可提交的示例材料参考。
 
 如果使用 Claude Code，先复制本地配置示例：
 
@@ -133,7 +151,7 @@ python scripts/init_project_workbench.py --project my-project --agent codex
 python scripts/init_project_workbench.py --project my-project --agent none
 ```
 
-默认是 `--agent claude`。`--agent none` 用于只生成目录、模板和状态，不拉起任何 Agent 客户端；`--no-agent` 作为兼容写法，等价于 `--agent none`。
+默认是 `--agent claude`  `--agent none` 用于只生成目录、模板和状态，不拉起任何 Agent 客户端；`--no-agent` 作为兼容写法，等价于 `--agent none`。
 
 ### 离线验证
 

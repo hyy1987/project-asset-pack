@@ -12,6 +12,7 @@ from _common import (
     generated_workbench_dir,
     invoke_agent_skill,
     load_workbench_state,
+    project_docs_root,
     project_security_rule_set,
     repo_relative,
     save_workbench_state,
@@ -63,12 +64,14 @@ def next_material_id(project_id: str) -> str:
     return f"{prefix}-{number:03d}"
 
 
-def source_display(raw_source: str) -> str:
+def source_display(project_id: str, raw_source: str) -> str:
     if not raw_source:
         return "聊天补充或待提供资料路径"
     path = Path(raw_source)
     if not path.is_absolute():
         candidate = (REPO_ROOT / path).resolve()
+        if not candidate.exists():
+            candidate = (project_docs_root(project_id) / path).resolve()
     else:
         candidate = path
     if candidate.exists():
@@ -112,7 +115,7 @@ def main() -> int:
     material_id = args.material_id or next_material_id(args.project)
     root = material_dir(args.project)
     record_path = root / f"{material_id}.md"
-    source = source_display(args.source)
+    source = source_display(args.project, args.source)
     title = args.title or material_id
     values = {
         "project_id": args.project,

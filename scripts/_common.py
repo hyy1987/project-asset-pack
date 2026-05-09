@@ -14,6 +14,7 @@ from typing import Any
 
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
+PROJECTS_ROOT = REPO_ROOT.parent
 
 
 def utc_now() -> str:
@@ -102,6 +103,32 @@ def find_simple_yaml_value(text: str, dotted_key: str, default: str = "") -> str
     return default
 
 
+def project_root(project_id: str) -> Path:
+    return PROJECTS_ROOT / project_id
+
+
+def project_docs_root(project_id: str) -> Path:
+    text = read_project_config_text(project_id)
+    configured = find_simple_yaml_value(text, "workbench.project_docs_root")
+    if configured:
+        return resolve_tool_path(configured)
+    return project_root(project_id) / f"{project_id}-docs"
+
+
+def resolve_tool_path(raw_path: str) -> Path:
+    path = Path(raw_path)
+    if path.is_absolute():
+        return path.resolve()
+    return (REPO_ROOT / path).resolve()
+
+
+def resolve_project_docs_path(project_id: str, raw_path: str) -> Path:
+    path = Path(raw_path)
+    if path.is_absolute():
+        return path.resolve()
+    return (project_docs_root(project_id) / path).resolve()
+
+
 def project_security_rule_set(project_id: str) -> str:
     config = load_project_config(project_id)
     return config.get("security", {}).get("rule_set") or "default-outsourcing-project"
@@ -111,8 +138,8 @@ def pre_project_materials_dir(project_id: str) -> Path:
     text = read_project_config_text(project_id)
     configured = find_simple_yaml_value(text, "workbench.pre_project_materials")
     if configured:
-        return (REPO_ROOT / configured).resolve()
-    return REPO_ROOT / "inputs" / "pre-project" / project_id
+        return resolve_project_docs_path(project_id, configured)
+    return project_docs_root(project_id) / "inputs" / "pre-project"
 
 
 def workbench_allows_code_changes(project_id: str) -> bool:
@@ -290,19 +317,19 @@ def run_smoke_check(check: dict[str, str]) -> dict[str, Any]:
 
 
 def generated_workbench_dir(project_id: str) -> Path:
-    return REPO_ROOT / "outputs" / "generated" / "workbench" / project_id
+    return project_docs_root(project_id) / "outputs" / "generated" / "workbench"
 
 
 def reviewed_workbench_dir(project_id: str) -> Path:
-    return REPO_ROOT / "outputs" / "reviewed" / "workbench" / project_id
+    return project_docs_root(project_id) / "outputs" / "reviewed" / "workbench"
 
 
 def workbench_state_path(project_id: str) -> Path:
-    return REPO_ROOT / "workspace" / "workbench" / project_id / "state.json"
+    return project_docs_root(project_id) / "workspace" / "workbench" / "state.json"
 
 
 def project_experience_path(project_id: str) -> Path:
-    return REPO_ROOT / "workspace" / "workbench" / project_id / "project-experience.md"
+    return project_docs_root(project_id) / "workspace" / "workbench" / "project-experience.md"
 
 
 def rule_candidates_path(project_id: str) -> Path:
@@ -319,7 +346,12 @@ def stage_reviewed_dir(project_id: str, stage_id: str) -> Path:
 
 def generated_asset_pack_dir(project_id: str) -> Path:
     config = load_project_config(project_id)
-    return REPO_ROOT / config.get("output", {}).get("generated", f"outputs/generated/{project_id}")
+    return resolve_project_docs_path(project_id, config.get("output", {}).get("generated", "outputs/generated/asset-pack"))
+
+
+def reviewed_asset_pack_dir(project_id: str) -> Path:
+    config = load_project_config(project_id)
+    return resolve_project_docs_path(project_id, config.get("output", {}).get("reviewed", "outputs/reviewed/asset-pack"))
 
 
 def load_workbench_state(project_id: str) -> dict[str, Any]:
@@ -362,7 +394,7 @@ def list_material_files(project_id: str, limit: int = 80) -> list[str]:
     files: list[str] = []
     for path in sorted(root.rglob("*")):
         if path.is_file():
-            files.append(path.relative_to(REPO_ROOT).as_posix())
+            files.append(repo_relative(path))
             if len(files) >= limit:
                 break
     return files
@@ -449,6 +481,10 @@ def repo_relative(path: Path) -> str:
     try:
         return path.resolve().relative_to(REPO_ROOT).as_posix()
     except ValueError:
+        pass
+    try:
+        return "../" + path.resolve().relative_to(PROJECTS_ROOT).as_posix()
+    except ValueError:
         return path.as_posix()
 
 
@@ -460,7 +496,7 @@ def get_project_repositories(project_id: str) -> list[dict[str, Any]]:
         raw_path = repo.get("path")
         if not name or not raw_path:
             continue
-        path = (REPO_ROOT / raw_path).resolve()
+        path = resolve_tool_path(raw_path)
         repos.append(
             {
                 "name": name,
@@ -472,7 +508,7 @@ def get_project_repositories(project_id: str) -> list[dict[str, Any]]:
 
 
 def baseline_path(project_id: str) -> Path:
-    return REPO_ROOT / "workspace" / "snapshots" / f"{project_id}-repo-baseline.json"
+    return project_docs_root(project_id) / "workspace" / "snapshots" / "repo-baseline.json"
 
 
 def load_baseline(project_id: str) -> dict[str, Any] | None:

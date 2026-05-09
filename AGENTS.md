@@ -8,6 +8,8 @@
 docs/agent-workflows/
 ```
 
+默认项目空间在 `project-asset-pack` 同级的 `../<project_id>/<project_id>-docs/`。除非项目配置显式覆盖，`inputs/`、`outputs/` 和 `workspace/` 都指这个项目资料目录下的路径，不再默认写入工具仓库内部。
+
 执行任何工作台或资产包任务前，先读取：
 
 1. `docs/agent-workflows/workbench-overview.md`

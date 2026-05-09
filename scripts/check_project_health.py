@@ -4,7 +4,17 @@ from __future__ import annotations
 import argparse
 import sys
 
-from _common import REPO_ROOT, add_agent_argument, get_project_repositories, invoke_agent_skill, load_project_config, run_git, selected_agent
+from _common import (
+    add_agent_argument,
+    generated_asset_pack_dir,
+    get_project_repositories,
+    invoke_agent_skill,
+    project_docs_root,
+    repo_relative,
+    reviewed_asset_pack_dir,
+    run_git,
+    selected_agent,
+)
 
 
 VALID_PERIODS = {"daily", "weekly", "milestone", "release", "handover"}
@@ -36,18 +46,17 @@ def repo_status_lines(project_id: str) -> list[str]:
 
 def main() -> int:
     args = parse_args()
-    config = load_project_config(args.project)
-    generated_dir = REPO_ROOT / config.get("output", {}).get("generated", f"outputs/generated/{args.project}")
-    reviewed_dir = REPO_ROOT / config.get("output", {}).get("reviewed", f"outputs/reviewed/{args.project}")
-    health_dir = REPO_ROOT / "outputs" / "generated" / "project-health" / args.project
+    generated_dir = generated_asset_pack_dir(args.project)
+    reviewed_dir = reviewed_asset_pack_dir(args.project)
+    health_dir = project_docs_root(args.project) / "outputs" / "generated" / "project-health"
 
     context = [
         f"Project id: {args.project}",
         f"Period: {args.period}",
         f"Project config: configs/projects/{args.project}.yaml",
-        f"Generated asset pack directory: {generated_dir.relative_to(REPO_ROOT).as_posix()}",
-        f"Reviewed asset pack directory: {reviewed_dir.relative_to(REPO_ROOT).as_posix()}",
-        f"Health output directory: {health_dir.relative_to(REPO_ROOT).as_posix()}",
+        f"Generated asset pack directory: {repo_relative(generated_dir)}",
+        f"Reviewed asset pack directory: {repo_relative(reviewed_dir)}",
+        f"Health output directory: {repo_relative(health_dir)}",
         "Current repository status:",
         *repo_status_lines(args.project),
     ]

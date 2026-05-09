@@ -5,7 +5,15 @@ import argparse
 import sys
 from pathlib import Path
 
-from _common import REPO_ROOT, add_agent_argument, invoke_agent_skill, load_project_config, selected_agent
+from _common import (
+    REPO_ROOT,
+    add_agent_argument,
+    generated_asset_pack_dir,
+    invoke_agent_skill,
+    repo_relative,
+    reviewed_asset_pack_dir,
+    selected_agent,
+)
 
 
 def parse_args() -> argparse.Namespace:
@@ -22,10 +30,8 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     args = parse_args()
-    config = load_project_config(args.project)
-
-    generated_dir = REPO_ROOT / config.get("output", {}).get("generated", f"outputs/generated/{args.project}")
-    reviewed_dir = REPO_ROOT / config.get("output", {}).get("reviewed", f"outputs/reviewed/{args.project}")
+    generated_dir = generated_asset_pack_dir(args.project)
+    reviewed_dir = reviewed_asset_pack_dir(args.project)
     comments_path = Path(args.comments) if args.comments else REPO_ROOT / "docs" / "manual" / "review-comments" / f"{args.project}.md"
     if not comments_path.is_absolute():
         comments_path = (REPO_ROOT / comments_path).resolve()
@@ -37,9 +43,9 @@ def main() -> int:
     context = [
         f"Project id: {args.project}",
         f"Project config: configs/projects/{args.project}.yaml",
-        f"Generated draft directory: {generated_dir.relative_to(REPO_ROOT).as_posix()}",
-        f"Reviewed output directory: {reviewed_dir.relative_to(REPO_ROOT).as_posix()}",
-        f"Manual review comments file: {comments_path.relative_to(REPO_ROOT).as_posix() if comments_path.exists() else '<missing>'}",
+        f"Generated draft directory: {repo_relative(generated_dir)}",
+        f"Reviewed output directory: {repo_relative(reviewed_dir)}",
+        f"Manual review comments file: {repo_relative(comments_path) if comments_path.exists() else '<missing>'}",
     ]
     if not comments_path.exists():
         context.append("Manual review comments are missing. Continue, but clearly mark that human comments were not provided.")

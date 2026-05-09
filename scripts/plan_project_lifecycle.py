@@ -62,9 +62,9 @@ def main() -> int:
     context_lines = [
         f"Project id: {args.project}",
         f"Security rule set: {project_security_rule_set(args.project)}",
-        f"Lifecycle plan output: outputs/generated/workbench/{args.project}/lifecycle-plan.md",
-        f"Material intake index, if any: outputs/generated/workbench/{args.project}/material-intake/index.md",
-        f"Change request index, if any: outputs/generated/workbench/{args.project}/change-requests/index.md",
+        f"Lifecycle plan output: {repo_relative(lifecycle_path)}",
+        f"Material intake index, if any: {repo_relative(out_dir / 'material-intake' / 'index.md')}",
+        f"Change request index, if any: {repo_relative(out_dir / 'change-requests' / 'index.md')}",
         "Generate a full project lifecycle plan before planning individual stages.",
         "Read material intake and change request indexes before revising scope or stage roadmap.",
         "The lifecycle plan must guide all later stage plans.",

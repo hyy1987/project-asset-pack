@@ -3,7 +3,7 @@ import json
 import re
 from pathlib import Path
 
-from _common import load_project_config
+from _common import load_project_config, resolve_project_docs_path, resolve_tool_path
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -14,7 +14,9 @@ def looks_like_path(value: str) -> bool:
         value.startswith("../")
         or value.startswith("./")
         or value.startswith("/")
+        or value.startswith("inputs/")
         or value.startswith("outputs/")
+        or value.startswith("workspace/")
         or re.match(r"^[A-Za-z]:[\\/]", value)
     )
 
@@ -71,9 +73,10 @@ def main() -> int:
 
     missing = []
     for raw_path in data.get("_paths", []):
-        if raw_path.startswith("outputs/"):
-            continue
-        candidate = (ROOT / raw_path).resolve()
+        if raw_path.startswith(("inputs/", "outputs/", "workspace/")):
+            candidate = resolve_project_docs_path(args.project, raw_path)
+        else:
+            candidate = resolve_tool_path(raw_path)
         if not candidate.exists():
             missing.append(str(candidate))
 

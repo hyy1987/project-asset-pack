@@ -116,7 +116,7 @@ def main() -> int:
     stage = state.get("stages", {}).get(args.stage_id, {})
     title = args.title or stage.get("title") or args.stage_id
     out_dir = stage_generated_dir(args.project, args.stage_id)
-    asset_update = stage.get("asset_pack_update") or f"outputs/generated/workbench/{args.project}/stages/{args.stage_id}/asset-pack-update.md"
+    asset_update = stage.get("asset_pack_update") or repo_relative(out_dir / "asset-pack-update.md")
     values = {
         "project_id": args.project,
         "stage_id": args.stage_id,

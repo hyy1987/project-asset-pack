@@ -14,6 +14,23 @@ Claude Code、Codex 或其他 Agent 客户端都应读取这里的规则。`.cla
 
 同一个项目不要同时用工作台和非工作台辅助流程并行管理。项目已经接入工作台后，应以工作台为主；暂不采用 Agent-First 模式的项目，才使用资产包增量更新和项目体检。
 
+## 默认项目空间
+
+`project-asset-pack` 是工具仓库，不默认承载真实项目的输入、输出和工作台状态。默认项目空间位于工具仓库同级目录：
+
+```text
+../<project_id>/
+|-- <project_id>-docs/
+|   |-- inputs/
+|   |-- outputs/
+|   `-- workspace/
+|-- frontend/
+|-- backend/
+`-- database/
+```
+
+除非 `configs/projects/<project_id>.yaml` 明确覆盖，所有工作台过程文件都写入 `../<project_id>/<project_id>-docs/`。配置中的 `workbench.pre_project_materials`、`output.generated` 和 `output.reviewed` 是相对项目资料仓库根目录的路径；`repositories.path` 是相对 `project-asset-pack` 的路径，通常指向同级业务子仓库。
+
 ## 工作台主线
 
 ```text
