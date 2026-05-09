@@ -1,55 +1,63 @@
 project_id: sample-project
 project_name: 示例项目
-project_type: historical
+project_type: new
 status: sample
+
 workbench:
-  mode: asset-pack-and-agent-first
+  mode: agent-first
   pre_project_materials: inputs/pre-project
   allow_code_changes: true
   default_stage_id: stage-1
-  default_stage_title: 第一阶段目标待填写
+  default_stage_title: 第一阶段
+
 owners:
-  project_manager: 待填写
-  tech_lead: 待填写
-  test_lead: 待填写
+  project_manager: 待补充
+  tech_lead: 待补充
+  test_lead: 待补充
+
 git:
   remote_base_url: git@github.com:your-org
   default_branch: main
   create_remote: true
   remote_visibility: private
+
 repositories:
-  - name: backend
-    path: ../sample-project/backend
-    description: 后端服务仓库
   - name: frontend
-    path: ../sample-project/frontend
+    path: ../sample-project/sample-project-frontend
     description: 前端应用仓库
+  - name: backend
+    path: ../sample-project/sample-project-backend
+    description: 后端服务仓库
   - name: database
-    path: ../sample-project/database
-    description: 数据库结构或迁移资料仓库
+    path: ../sample-project/sample-project-database
+    description: 数据库结构、迁移和种子数据仓库
+
 documents:
   requirements:
-    - ../sample-project/docs/requirements
+    - ../sample-project/sample-project-docs/inputs/pre-project
   designs:
-    - ../sample-project/docs/designs
+    - ../sample-project/sample-project-docs/docs
   api:
-    - ../sample-project/docs/api
+    - ../sample-project/sample-project-docs/docs
   database:
-    - ../sample-project/database
+    - ../sample-project/sample-project-database
   tests:
-    - ../sample-project/docs/tests
+    - ../sample-project/sample-project-backend/tests
   defects:
-    - ../sample-project/docs/defects
+    - ../sample-project/sample-project-docs/docs
   delivery:
-    - ../sample-project/docs/delivery
+    - ../sample-project/sample-project-docs/docs
+
 security:
   rule_set: default-outsourcing-project
+
 quality:
   commands:
     - name: config check
       cwd: .
       run: python scripts/check_project_config.py --project sample-project
       timeout_seconds: 60
+
 output:
   generated: outputs/generated/asset-pack
   reviewed: outputs/reviewed/asset-pack

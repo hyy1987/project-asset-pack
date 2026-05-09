@@ -104,7 +104,7 @@ def main() -> int:
 
     if remote_visibility not in {"private", "public", "internal"}:
         raise RuntimeError("git.remote_visibility must be one of: private, public, internal")
-    if create_remote and not args.confirmed:
+    if create_remote and not args.confirmed and not args.dry_run:
         raise RuntimeError("Remote creation requires --confirmed after human approval of repository split and naming.")
     if create_remote and not remote_base:
         raise RuntimeError("Remote creation requires git.remote_base_url in project config.")
