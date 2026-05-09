@@ -31,6 +31,12 @@ Claude Code、Codex 或其他 Agent 客户端都应读取这里的规则。`.cla
 
 除非 `configs/projects/<project_id>.yaml` 明确覆盖，所有工作台过程文件都写入 `../<project_id>/<project_id>-docs/`。配置中的 `workbench.pre_project_materials`、`output.generated` 和 `output.reviewed` 是相对项目资料仓库根目录的路径；`repositories.path` 是相对 `project-asset-pack` 的路径，通常指向同级业务子仓库。
 
+项目配置可以声明 `git.remote_base_url`、`git.default_branch`、`git.create_remote` 和 `git.remote_visibility`。需要创建或补齐本地业务仓库时，运行 `python scripts/init_project_repositories.py --project <project_id>`；脚本会按 `<project_id>-<repo_name>` 作为默认远程仓库名，创建缺失目录、执行 `git init` 并设置 `origin`。只有需要覆盖默认前缀时，才配置 `git.repo_name_prefix`。如果 `git.create_remote: true`，Agent 只能在人类确认仓库拆分和命名之后运行 `python scripts/init_project_repositories.py --project <project_id> --confirmed` 创建远程仓库。
+
+远程仓库保护是硬约束：远程仓库已存在时失败，不覆盖；本地仓库已有不同 `origin` 时失败，不执行 `git remote set-url`。
+
+子仓库创建提醒应发生在全周期规划之后、阶段开发之前。不要在工作台初始化时自动创建；先让规划确认仓库拆分和交付边界，再提醒创建或补齐缺失仓库。
+
 ## 工作台主线
 
 ```text

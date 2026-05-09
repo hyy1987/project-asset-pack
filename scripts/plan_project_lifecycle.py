@@ -66,6 +66,9 @@ def main() -> int:
         f"Material intake index, if any: {repo_relative(out_dir / 'material-intake' / 'index.md')}",
         f"Change request index, if any: {repo_relative(out_dir / 'change-requests' / 'index.md')}",
         "Generate a full project lifecycle plan before planning individual stages.",
+        f"After the lifecycle plan is drafted and human-confirmed, the Agent may create or complete project repositories before stage development: python scripts/init_project_repositories.py --project {args.project} --confirmed",
+        "Repository initialization must never overwrite an existing remote repository or replace a different local origin.",
+        "The repository creation reminder should appear after planning, not during workbench initialization or every resume.",
         "Read material intake and change request indexes before revising scope or stage roadmap.",
         "The lifecycle plan must guide all later stage plans.",
     ]

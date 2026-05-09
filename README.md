@@ -72,6 +72,43 @@ my-project/
 
 默认规则是：业务代码仓库、数据库仓库和项目资料仓库跟 `project-asset-pack` 平级，项目过程材料进入 `<project_id>/<project_id>-docs/`。如果某个项目已有自己的目录规范，可以在 `configs/projects/<project_id>.yaml` 中覆盖 `workbench.project_docs_root`、`workbench.pre_project_materials`、`repositories.path`、`output.generated` 和 `output.reviewed`。
 
+## Git 仓库初始化
+
+如果希望工具按固定 Git 账号或组织路径创建项目子仓库，可以在项目配置中增加：
+
+```yaml
+git:
+  remote_base_url: git@github.com:your-org
+  default_branch: main
+  create_remote: true
+  remote_visibility: private
+repositories:
+  - name: backend
+    path: ../my-project/backend
+  - name: frontend
+    path: ../my-project/frontend
+  - name: database
+    path: ../my-project/database
+```
+
+然后运行：
+
+```powershell
+python scripts/init_project_repositories.py --project my-project
+```
+
+脚本会创建缺失的本地仓库目录，执行 `git init`，并按 `remote_base_url/<project_id>-name.git` 设置 `origin`。例如上面的 `frontend` 会得到 `git@github.com:your-org/my-project-frontend.git`。如果确实需要覆盖仓库名前缀，可以额外配置 `git.repo_name_prefix`。
+
+如果配置了 `git.create_remote: true`，Agent 在人类确认仓库拆分和命名之后，可以自行运行：
+
+```powershell
+python scripts/init_project_repositories.py --project my-project --confirmed
+```
+
+脚本只支持用 GitHub CLI `gh` 创建缺失的 GitHub 远程仓库。硬性限制：远程仓库已存在时直接失败，不覆盖；本地仓库已有不同 `origin` 时也直接失败，不执行 `git remote set-url`。
+
+触发时机建议放在全周期规划之后、阶段开发之前。先通过规划确认仓库拆分方式，再创建或补齐子仓库；恢复工作台时如果发现规划已生成但业务子仓库还缺失，会提示运行上面的命令。
+
 ## 快速验证 sample-project
 
 仓库内置了一个可直接测试的示例材料目录：

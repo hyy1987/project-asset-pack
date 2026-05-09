@@ -29,6 +29,7 @@ def load_project_config(project_id: str) -> dict[str, Any]:
     config: dict[str, Any] = {
         "project_id": project_id,
         "repositories": [],
+        "git": {},
         "security": {},
         "output": {},
     }
@@ -66,7 +67,7 @@ def load_project_config(project_id: str) -> dict[str, Any]:
                 current_item[key.strip()] = value.strip()
             continue
 
-        if current_section in {"security", "output"} and ":" in stripped:
+        if current_section in {"git", "security", "output"} and ":" in stripped:
             key, value = stripped.split(":", 1)
             config[current_section][key.strip()] = value.strip()
 

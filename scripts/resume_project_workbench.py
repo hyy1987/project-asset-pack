@@ -9,6 +9,7 @@ from typing import Any
 from _common import (
     add_agent_argument,
     generated_workbench_dir,
+    get_project_repositories,
     invoke_agent_skill,
     list_material_files,
     load_workbench_state,
@@ -104,6 +105,14 @@ def build_change_request_summary(state: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
+def repository_setup_needed(project_id: str) -> bool:
+    for repo in get_project_repositories(project_id):
+        path = repo["path"]
+        if not path.is_dir() or not (path / ".git").exists():
+            return True
+    return False
+
+
 def infer_next_action(state: dict[str, Any], stage_id: str | None) -> str:
     status = state.get("status", "new")
     current_stage_id = stage_id or state.get("current_stage_id")
@@ -169,6 +178,9 @@ def main() -> int:
     reviewed_dir = reviewed_workbench_dir(args.project)
     material_dir = pre_project_materials_dir(args.project)
     stage_id = args.stage_id or state.get("current_stage_id") or ""
+    next_action = infer_next_action(state, stage_id or None)
+    if state.get("status") == "lifecycle-planned" and repository_setup_needed(args.project):
+        next_action += f" 人类确认仓库拆分和命名后，Agent 应创建或补齐业务子仓库：python scripts/init_project_repositories.py --project {args.project} --confirmed"
 
     values = {
         "project_id": args.project,
@@ -187,7 +199,7 @@ def main() -> int:
         "stage_summary": build_stage_summary(state),
         "material_summary": build_material_summary(state),
         "change_request_summary": build_change_request_summary(state),
-        "next_action": infer_next_action(state, stage_id or None),
+        "next_action": next_action,
     }
 
     resume_path = write_rendered_template(

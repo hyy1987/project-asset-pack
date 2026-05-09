@@ -12,6 +12,11 @@ owners:
   project_manager: 待填写
   tech_lead: 待填写
   test_lead: 待填写
+git:
+  remote_base_url: git@github.com:your-org
+  default_branch: main
+  create_remote: true
+  remote_visibility: private
 repositories:
   - name: backend
     path: ../sample-project/backend
